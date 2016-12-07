@@ -1,0 +1,62 @@
+<html>
+<head>
+  <title>Cities distance</title>
+  <Style>
+  #nearbyCitiesView {
+    display: none;
+  }
+  </style>
+</head>
+<body>
+
+  <button>Locate me</button>
+  <div id="located_at"></div>
+
+  <div id="nearbyCitiesView">
+    <h1>Nearby Cities</h1>
+    <ul id="nearbyCities"></ul>
+  </div>
+
+    <!-- javascript includes -->
+    <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <script>
+    (function() {
+
+      var cities;
+      var socket = io.connect(window.location.hostname + ":" + window.location.port);
+
+      $('button').on('click', function() {
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+          $('#located_at').html("Geolocation is not supported by this browser.");
+        }
+
+        function showPosition(position) {
+          $('#located_at').html("Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude);
+          socket.emit('citiesNearby', {
+            lat: position.coords.latitude,
+            long: position.coords.longitude
+          });
+        }
+
+      });
+
+      socket.on('citiesNearbyResults', function(nearbyCities) {
+        console.log(nearbyCities);
+        var $el = $('#nearbyCities');
+        $el.empty();
+        nearbyCities.forEach(function(city) {
+          $el.append('<li>' + city.cityname + ' (lat: ' + city.lat + ', long: ' + city.long + ')</li>')
+        });
+        $('#nearbyCitiesView').show();
+      });
+
+    })();
+
+    </script>
+</body>
+</html>
