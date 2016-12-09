@@ -30,6 +30,9 @@
     text-align: center;
     color: blue;
   }
+  a:visited: {
+    color: blue;
+  }
   #nav a:hover {
     background-color: #ccc;
   }
@@ -550,7 +553,7 @@
       }
     };
 
-    $('#nav').on('click', 'a', function(e) {
+    $(document).on('click', 'a', function(e) {
       var href = $(this).attr('href');
       app.navigate.goTo(href);
       e.preventDefault();
