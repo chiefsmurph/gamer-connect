@@ -102,7 +102,7 @@
 
     <div id="home" class="page">
       <h2>Welcome to City Leaders</h2>
-      <p>A location-based game where the goal is to accrue as many points as possible by becoming the City Leader of your current city.  Every hour that goes by that you are the City Leader you get 10 points.  And you can be the Leader of more than one city at a time.  But be careful or else other players will attack and try to coop your leadership.  Cities that in contention are ones that have a population of more than 1,000 people.</p>
+      <p>A location-based game where the goal is to accrue as many points as possible by becoming the City Leader of your current city.  Every hour that goes by that you are the City Leader you get 10 points.  And you can be the Leader of more than one city at a time.  But be careful or else other players will attack and try to coop your leadership.  Cities that are in contention are ones that have a population of more than 1,000 people.</p>
       <div id="signUpCall"><a href="signup">Click here to sign up</a></div>
     </div>
 
@@ -252,7 +252,7 @@
             lat: position.coords.latitude,
             long: position.coords.longitude
           };
-          app.set({ location: locObj });
+          app.set(locObj);
           socket.emit('citiesNearby', locObj);
         });
 
@@ -267,9 +267,7 @@
             return acc.concat([city.cityname]);
           }, []).slice(0, 5);
           app.set({
-            location: {
-              nearestCity: nearestCity
-            }
+            nearestCity: nearestCity
           });
           callback(nearestCity, fiveOthers);
 
@@ -397,13 +395,14 @@
             });
 
             $('#join').one('click', function() {
+              debugger;
               var username = $('#username').val();
-              var locationString = app.state.location.nearestCity.cityname + ', ' + app.state.location.nearestCity.admincode + ' (' + app.state.location.nearestCity.country + ')';
-
+              var locationString = app.state.nearestCity.cityname + ', ' + app.state.nearestCity.admincode + ' (' + app.state.nearestCity.country + ')';
+              debugger;
               socket.emit('newUser', {
                 username: username,
-                lat: app.state.location.lat,
-                long: app.state.location.long,
+                lat: app.state.lat,
+                long: app.state.long,
                 nearestCity: locationString
               });
 

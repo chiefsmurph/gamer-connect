@@ -332,13 +332,15 @@ io.sockets.on('connection', function (socket) {
   // user stuff
 
   socket.on('newUser', function(data) {
-    console.log(data);
+    console.log(JSON.stringify(data));
+    console.log(JSON.stringify(user));
     if (data.lat === user.lat && data.long === user.long) {
+      console.log('here')
       if (!(data.username.length > 3 && data.username.length < 14)) {
         return socket.emit('createUserError', 'Username must be between 3 & 14 characters in length');
       }
       dbFunctions.createNewUser(data.username, data.lat, data.long, data.nearestCity, function(result) {
-        // console.log('res' + result);
+        console.log('res' + result);
         if (result) {
           user = Object.assign({}, result, {
             loggedIn: true
