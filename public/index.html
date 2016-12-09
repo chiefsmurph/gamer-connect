@@ -71,7 +71,7 @@
     font-size: 22px;
   }
   button {
-    font-size: 16px;
+    font-size: 21px;
     padding: 5px 35px;
   }
   button#join {
@@ -100,6 +100,9 @@
     color: grey;
     font-style: italic;
   }
+  #your-portal #your-cities {
+    display: none;
+  }
   #conquer-cities > div {
     margin-bottom: 1em;
   }
@@ -116,6 +119,27 @@
     margin-top: 1em;
   }
   .datagrid table { border-collapse: collapse; text-align: left; width: 100%; font-size: 80%; } .datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: #fff; overflow: hidden; border: 1px solid #006699; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }.datagrid table td, .datagrid table th { padding: 3px 10px; }.datagrid table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; color:#ffffff; font-weight: bold; border-left: 1px solid #0070A8; } .datagrid table thead th:first-child { border: none; }.datagrid table tbody td { color: #00496B; border-left: 1px solid #E1EEF4;font-weight: normal; }.datagrid table tbody .alt td { background: #E1EEF4; color: #00496B; }.datagrid table tbody td:first-child { border-left: none; }.datagrid table tbody tr:last-child td { border-bottom: none; }.datagrid table tfoot td div { border-top: 1px solid #006699;background: #E1EEF4;} .datagrid table tfoot td { padding: 0; } .datagrid table tfoot td div{ padding: 2px; }.datagrid table tfoot td ul { margin: 0; padding:0; list-style: none; text-align: right; }.datagrid table tfoot  li { display: inline; }.datagrid table tfoot li a { text-decoration: none; display: inline-block;  padding: 2px 8px; margin: 1px;color: #FFFFFF;border: 1px solid #006699;-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; }.datagrid table tfoot ul.active, .datagrid table tfoot ul a:hover { text-decoration: none;border-color: #006699; color: #FFFFFF; background: none; background-color:#00557F;}div.dhtmlx_window_active, div.dhx_modal_cover_dv { position: fixed !important; }
+
+  .modal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    height: 70%;
+    background-color: rgba(0,200,10,0.9);
+    border-top: 10px solid green;
+    padding: 10px;
+    display: none;
+    text-align: center;
+  }
+
+  .modal.beingAttacked, .modal#attackFailed {
+    background-color: rgba(200,10,10,0.9);
+    border-top: 10px solid red;
+  }
+
+
   </style>
 
   <link href='https://fonts.googleapis.com/css?family=Audiowide' rel='stylesheet' type='text/css'>
@@ -150,6 +174,10 @@
     <div id="your-portal" class="page">
       <h2>Welcome <span class='username'></span></h2>
       Your score: <span id="myPoints"></span>
+      <div id="your-cities">
+        Your cities:
+        <ul></ul>
+      </div>
     </div>
 
     <div id="conquer-cities" class="page">
@@ -175,6 +203,7 @@
         </thead>
         <tbody>
         </tbody>
+      </table>
     </div>
 
     <div id="error" class="page">
@@ -183,6 +212,22 @@
 
   </div>
 
+  <div class="modal" id="attackModal">
+    <h2>You are attacking <span class="attackingName"></span></h2>
+    ...to gain control of <span class="attackingCityName"></span>
+  </div>
+
+  <div class="modal" id="attackFailed">
+    <h2><span class="attackingName"></span> blocked your attack of <span class="attackingCityName"></span></h2>
+  </div>
+
+  <div class="modal" id="attackSuccess">
+    <h2>Congrats!  You were able to steal leadership of <span class="attackingCityName"></span> from <span class="attackingName"></span></h2>
+  </div>
+
+  <div class="modal" id="dethroned">
+    <h2>You have been dethroned of <span id="dethronedCity"></span></h2>
+  </div>
 
   <!-- javascript includes -->
   <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
@@ -274,6 +319,69 @@
             app.pages.leaderboard.updateScore(row);
           });
 
+          // sending attack response
+          var attackResponse = function(response) {
+            $('#attackModal').fadeOut(300, function() {
+
+              $('#' + response).show();
+              setTimeout(function() {
+                app.cue('conquer-cities.reset');
+                app.forceReinit('conquer-cities');
+                app.navigate.goTo('your-portal');
+
+                $('#' + response).hide();
+              }, 4000);
+            });
+          };
+
+          socket.on('tookControl', function(cityObj) {
+            console.log('took control iof', cityObj);
+            attackResponse('attackSuccess');
+            // update your-cities
+            app.cue('your-portal.updateCurrentCities', app.state.cities.concat([cityObj.cityname]));
+          });
+
+          socket.on('attackFailed', function() {
+            attackResponse('attackFailed');
+          });
+
+
+          // receiving attacks
+          socket.on('beingAttacked', function(data) {
+            console.log('being attacked', data);
+
+            var $modal = $('<div class="modal beingAttacked">Your city of <b>' + data.city.cityname + '</b> is being attacked by ' + data.attacker + '<br><br><button>click here to BLOCK THE ATTACK</button></div>');
+            $modal.data('attack-id', data.attackid).show();
+            $('body').append($modal);
+          });
+
+          $('body').on('click', '.modal.beingAttacked button', function() {
+            var $modal = $(this).parent();
+            var attackid = $modal.data('attack-id');
+            socket.emit('blockAttack', attackid);
+
+            socket.once('attackBlockSuccess', function() {
+              $modal.hide();
+              $modal.remove();
+            });
+          });
+
+          socket.on('dethroned', function(cityObj) {
+            console.log('you have been dethroned of ', cityObj);
+            app.cue('your-portal.updateCurrentCities', app.state.cities.filter(function(city) {
+              return city !== cityObj.cityname;
+            }));
+            $('.beingAttacked').remove();
+            $('#dethronedCity').html(cityObj.cityname);
+            $('#dethroned').show();
+            setTimeout(function() {
+              $('#dethroned').show();
+            }, 1000);
+            app.cue('conquer-cities.reset');
+            app.forceReinit('conquer-cities');
+            app.navigate.goTo('your-portal');
+          });
+
         }
       },
       init: function() {
@@ -311,6 +419,7 @@
             console.log('response: ' + JSON.stringify(response));
             if (response) {
               app.set(Object.assign({}, savedInfo, response));
+              app.cue('your-portal.updateCurrentCities', response.cities);
               console.log(app.state);
               app.cue('global.becomeLoggedIn');
               onLoad();
@@ -369,11 +478,13 @@
 
             var $username = this.$username;
             $username.focus();
-            $('#join').one('click', function() {
+            $('#join').on('click', function() {
+
+              var loading = new loadingSpinner($('#createUserFeedback'));
 
               var username = $username.val();
               var locationString = app.state.nearestCity.cityname + ', ' + app.state.nearestCity.admincode + ' (' + app.state.nearestCity.country + ')';
-
+              console.log('join', username, locationString);
               socket.emit('newUser', {
                 username: username,
                 lat: app.state.lat,
@@ -413,13 +524,29 @@
           },
           init: function() {
             // $('.username').text(app.state.username);
+          },
+          updateCurrentCities: function(cities) {
+            console.log(cities,'cities')
+            $('#your-cities').toggle(!!cities.length);
+            $('#your-cities ul').html(cities.map(function(city) {
+              return '<li>' + city + '</li>';
+            }));
           }
         },
         'conquer-cities': {
           protected: true,
+          dom: {
+            attackingName: {
+              el: '.attackingName',
+              map: 'attackingName'
+            },
+            attackingCityName: {
+              el: '.attackingCityName',
+              map: 'attackingCityName'
+            }
+          },
           init: function() {
-            $('.step2, .step3').hide();
-            $('#conquer-cities .step1').show();
+            this.reset();
 
             var spinners = [];
             spinners.stop = function() {
@@ -427,7 +554,6 @@
                 spinner.doneLoading();
               });
             };
-            var nearestTo;
 
             // step 1: get current location
             ['curCity', 'nearbyCities'].forEach(function(id) {
@@ -437,10 +563,8 @@
             locationModule.getCurrentCity(function(nearestCity, fiveOthers) {
               spinners.stop();
               if (nearestCity) {
-                nearestTo = nearestCity;
                 $('#curCity').text(nearestCity.cityname);
                 $('#nearbyCities').text(fiveOthers.join(', '));
-
                 setTimeout(stepTwo, 1000);
               }
             });
@@ -450,14 +574,17 @@
               $('#conquer-cities .step2').show();
               spinners.push(new loadingSpinner($('#conquer-cities .step2 #curLeader')));
 
-              socket.emit('getCurrentLeader', nearestTo.cityid);
+              socket.emit('getCurrentLeader', app.state.nearestCity.cityid);
 
               socket.once('currentLeaderFeedback', function(leader) {
+                app.set({curLeader: leader});
+                leader = (leader) ? leader.username : null;
                 spinners.stop();
                 $('#conquer-cities .step3').show();
                 if (!leader) {
                   $('#conquer-cities .step2 #curLeader').text('No current leader');
                   $('#conquer-cities .step3 #attackQ').text('Would you like to become leader of the city?');
+                  $('#conquer-cities .step3 button').data('conquer-type', 'usurp');
                 } else if (leader === app.state.username) {
                   $('#conquer-cities .step3 #attackQ').text('You are already the leader of this city.  Go off and conquer more cities.');
                   $('#conquer-cities .step2 #curLeader').text(leader);
@@ -467,25 +594,62 @@
                   $('#conquer-cities .step2 #curLeader').text(leader);
                   $('#conquer-cities .step3 #attackQ').text('Would you like to try to take over the city in a coup?');
                   $('#conquer-cities .step3 button').text('Click here to attack the leadership of ' + leader);
+                  $('#conquer-cities .step3 button').data('conquer-type', 'attack');
                 }
               });
 
               $('#conquer-cities button').one('click', function() {
-                console.log('conqieruing')
-                socket.emit('conquerCity', nearestTo);
+                if ($(this).data('conquer-type') === 'usurp') {
+                  console.log('conqieruing')
+                  socket.emit('conquerCity', app.state.nearestCity);
 
-                spinners.push(new loadingSpinner($('#conquer-cities #attackResults')));
+                  spinners.push(new loadingSpinner($('#conquer-cities #attackResults')));
 
-                socket.once('conquerResponse', function(data) {
-                  spinners.stop();
-                  console.log(data);
-                  $('#conquer-cities #attackResults').html('Congrats, you are now the leader of ' + data.cityname + ' and you will accumulate 10 points every hour.  But don\'t stop here.  Go out and conquer more lands').addClass('green');
-                });
+                  socket.once('conquerResponse', function(data) {
+                    spinners.stop();
+                    console.log(data);
+                    $('#conquer-cities #attackResults').html('Congrats, you are now the leader of ' + data.cityname + ' and you will accumulate 10 points every hour.  But don\'t stop here.  Go out and conquer more lands').addClass('green');
+                  });
+                } else {
+
+                  socket.emit('attackCity', {
+                    city: app.state.nearestCity,
+                    leader: app.state.curLeader.leaderid
+                  });
+
+                  new loadingSpinner($('#conquer-cities #attackResults'));
+
+                  socket.once('attackConfirm', function(data) {
+                    $('#conquer-cities #attackResults').html('Attack confirmed').addClass('green');
+
+                    app.set({
+                      attackingCityName: app.state.nearestCity.cityname,
+                      attackingName: app.state.curLeader.username
+                    });
+
+                    setTimeout(function() {
+                      $('#attackModal').show();
+                    }, 600);
+
+                  });
+
+
+
+                }
+
               });
 
             }
 
+          },
+
+          reset: function() {
+            $('.step2, .step3').hide();
+            $('#conquer-cities .step1').show();
+            $('#conquer-cities .step3 button').show();
+            $('#attackResults').html('');
           }
+
         },
         'leaderboard': {
           protected: true,
@@ -498,11 +662,14 @@
             this.top10.forEach(function(row) {
               $tbody.append('<tr><td>' + row.username + '</td><td>' + row.points + '</td></tr>');
             });
+
+            $('#leaderboard tbody td:contains(' + app.state.username + ')').parent().css('background-color', 'yellow');
           },
 
           setAndRender: function(data) {
             this.top10 = data;
             this.renderTop10();
+
           },
 
           updateScore: function(row) {
@@ -514,10 +681,10 @@
               foundScore[0].points = row.points;
             } else {
               this.top10.push(row);
-              this.top10.sort(function(a, b) {
-                return a.points > b.points;
-              });
             }
+            this.top10.sort(function(a, b) {
+              return b.points - a.points;
+            });
             this.renderTop10();
           }
 
@@ -561,12 +728,18 @@
       app.state = Object.assign({}, app.state, stateUpdate);
     };
 
-    app.cue = function(what) {
+    app.cue = function(what, data) {
       var split = what.split('.');
       var page = split[0];
       var fnName = split[1];
       console.log('cueing ' + page + ' ' + fnName);
-      app[page][fnName]();
+      var fn = (page === 'global') ? app.global[fnName] : app.pages[page][fnName]
+      fn(data);
+    };
+
+    var pagesToForce = {};
+    app.forceReinit = function(page) {
+      pagesToForce[page] = true;
     };
 
     app.navigate = {
@@ -577,10 +750,12 @@
 
         $('.page').hide();
 
-        if (app.pages[page] && app.pages[page].init && !this.pagesVisited[page]) {
-          // only runs the first time the page is accessed
+        if (app.pages[page] && app.pages[page].init && (!this.pagesVisited[page] || pagesToForce[page]) ) {
+          // only runs the first time the page is accessed unless pagesToForce[page]
           app.pages[page].init(value);
+          delete pagesToForce[page];
         }
+
 
         $('#' + page + '.page').show();
 
