@@ -28,6 +28,7 @@
     margin: 0.4vw;
     flex-grow: 1;
     text-align: center;
+    color: blue;
   }
   #nav a:hover {
     background-color: #ccc;
@@ -77,6 +78,14 @@
   #conquer-cities button {
     margin-top: 4px;
   }
+  #leaderboard {
+    font-size: 150%;
+  }
+  #leaderboard thead {
+    letter-spacing: 2px;
+  }
+
+  .datagrid table { border-collapse: collapse; text-align: left; width: 100%; } .datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: #fff; overflow: hidden; border: 1px solid #006699; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }.datagrid table td, .datagrid table th { padding: 3px 10px; }.datagrid table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; color:#ffffff; font-weight: bold; border-left: 1px solid #0070A8; } .datagrid table thead th:first-child { border: none; }.datagrid table tbody td { color: #00496B; border-left: 1px solid #E1EEF4;font-weight: normal; }.datagrid table tbody .alt td { background: #E1EEF4; color: #00496B; }.datagrid table tbody td:first-child { border-left: none; }.datagrid table tbody tr:last-child td { border-bottom: none; }.datagrid table tfoot td div { border-top: 1px solid #006699;background: #E1EEF4;} .datagrid table tfoot td { padding: 0; font-size: 12px } .datagrid table tfoot td div{ padding: 2px; }.datagrid table tfoot td ul { margin: 0; padding:0; list-style: none; text-align: right; }.datagrid table tfoot  li { display: inline; }.datagrid table tfoot li a { text-decoration: none; display: inline-block;  padding: 2px 8px; margin: 1px;color: #FFFFFF;border: 1px solid #006699;-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; }.datagrid table tfoot ul.active, .datagrid table tfoot ul a:hover { text-decoration: none;border-color: #006699; color: #FFFFFF; background: none; background-color:#00557F;}div.dhtmlx_window_active, div.dhx_modal_cover_dv { position: fixed !important; }
   </style>
 
   <link href='https://fonts.googleapis.com/css?family=Audiowide' rel='stylesheet' type='text/css'>
@@ -87,14 +96,14 @@
 
     <h1>City Leaders</h1>
     <div id="nav">
-      <a href="javascript:navigate.goTo('home')">Home</a>
-      <a href="javascript:navigate.goTo('signup')">Sign Up</a>
+      <a href="home">Home</a>
+      <a href="signup">Sign Up</a>
     </div>
 
     <div id="home" class="page">
       <h2>Welcome to City Leaders</h2>
       <p>A location-based game where the goal is to accrue as many points as possible by becoming the City Leader of your current city.  Every hour that goes by that you are the City Leader you get 10 points.  And you can be the Leader of more than one city at a time.  But be careful or else other players will attack and try to coop your leadership.  Cities that in contention are ones that have a population of more than 1,000 people.</p>
-      <div id="signUpCall"><a href="javascript:navigate.goTo('signup')">Click here to sign up</a></div>
+      <div id="signUpCall"><a href="signup">Click here to sign up</a></div>
     </div>
 
     <div id="signup" class="page">
@@ -126,6 +135,16 @@
         <button>Click here to take control of the city</button>
         <div id="attackResults"></div>
       </div>
+    </div>
+
+    <div id="leaderboard" class="page datagrid">
+      <table>
+        <thead>
+          <th>Username</th>
+          <th>Points</th>
+        </thead>
+        <tbody>
+        </tbody>
     </div>
 
     <div id="error" class="page">
@@ -220,63 +239,11 @@
       $where.find('img.spinner').remove();
     };
   };
-  var navigate = {
-    hasErrored: false,
-    pagesVisited: {},
-    goTo: function(page, value) {
-      if (this.hasErrored) return;
 
-      $('.page').hide();
-
-      if (pages[page] && pages[page].init && !this.pagesVisited[page]) {
-        // only runs the first time the page is accessed
-        pages[page].init(value);
-      }
-
-      $('#' + page + '.page').show();
-
-      // updates navigation with selected currentPage
-      var unHef = page.replace('-', ' ');
-      $('#nav a').removeClass('currentPage');
-      $('#nav a:contains(' + unHef + ')').addClass("currentPage");
-
-      history.pushState({}, unHef, page);
-      this.pagesVisited[page] = true;
-    }
-  };
-
-  var pages;
 
   (function() {
 
-    var socket = io.connect(window.location.hostname + ":" + window.location.port);
-
-    var state = {
-      isLoggedIn: false
-    };
-
-    $('button').on('click', function(e) {
-      e.preventDefault();
-    });
-
-    var becomeLoggedIn = function() {
-      state.isLoggedIn = true;
-      renderNavMenu();
-
-      var renderPoints = function() {
-        $('#myPoints').text(state.points);
-      };
-      renderPoints();
-
-      socket.on('pointsUpdate', function(data) {
-        console.log('updated points', data);
-        state.points = data;
-        renderPoints();
-      });
-
-    };
-
-    locationModule = {
+    var locationModule = {
       getCurrentCity: function(callback) {
 
         navigator.geolocation.getCurrentPosition(function sendPosition(position) {
@@ -285,7 +252,7 @@
             lat: position.coords.latitude,
             long: position.coords.longitude
           };
-          state.location = locObj;
+          app.set({ location: locObj });
           socket.emit('citiesNearby', locObj);
         });
 
@@ -299,7 +266,11 @@
           var fiveOthers = byCities.reduce(function(acc, city) {
             return acc.concat([city.cityname]);
           }, []).slice(0, 5);
-          state.location.nearestCity = nearestCity;
+          app.set({
+            location: {
+              nearestCity: nearestCity
+            }
+          });
           callback(nearestCity, fiveOthers);
 
         });
@@ -307,211 +278,332 @@
       }
     };
 
-    pages = {
-      error: {
-        init: function(message) {
-          navigate.hasErrored = true;
-          $('#error b').text(message);
-        }
+    var socket = io.connect(window.location.hostname + ":" + window.location.port);
+    var app = johnsFramework({
+      state: {
+        isLoggedIn: false
       },
-      home: {
-        init: function() {
-            $('#signUpCall').toggle(!state.isLoggedIn);
-        }
-      },
-      signup: {
-        init: function() {
-          // debugger;
-          // alert('sign up');
-
-          $('#getCurrentPosition').one('click', function() {
-
-            locationModule.getCurrentCity(function(nearestCity, fiveOthers) {
-              if (!nearestCity) {
-                return $('#foundLocation').html('That\'s strange.  We were unable to find you');
-              }
-              var html = 'Great! Your geolocation seems to be working well.<br>We found you in ' + nearestCity.cityname + '.';
-              html += (fiveOthers.length) ? '<br>Cities nearby: ' + fiveOthers.join(', ') : '';
-              $('#foundLocation').html(html);
-              $('#join').show();
-              $('#getCurrentPosition').remove();
-            });
-
-          });
-
-          $('#join').one('click', function() {
-            var username = $('#username').val();
-            var locationString = state.location.nearestCity.cityname + ', ' + state.location.nearestCity.admincode + ' (' + state.location.nearestCity.country + ')';
-
-            socket.emit('newUser', {
-              username: username,
-              lat: state.location.lat,
-              long: state.location.long,
-              nearestCity: locationString
-            });
-
-            socket.once('createUserError', function(errText) {
-              $('#createUserFeedback').text(errText).addClass("red");
-            });
-
-            socket.once('createUserSuccess', function(data) {
-              console.log(data);
-              $('#createUserFeedback').text('Successfully created your account.').addClass("green");
-              state = Object.assign({}, state, data);
-              docCookies.setItem('accountinfo', JSON.stringify(data));
-              becomeLoggedIn();
-              setTimeout(function() {
-                navigate.goTo('your-portal');
-              }, 1000);
-            });
-          });
-
-        }
-      },
-      'your-portal': {
-        protected: true,
-        init: function() {
-          $('.username').text(state.username);
-        }
-      },
-      'conquer-cities': {
-        protected: true,
-        init: function() {
-          $('#conquer-cities [class^=step').hide();
-          $('#conquer-cities .step1').show();
-
-          var spinners = [];
-          spinners.stop = function() {
-            this.forEach(function(spinner) {
-              spinner.doneLoading();
-            });
+      global: {
+        renderNavMenu: function() {
+          $('#nav').empty();
+          var renderSingle = function(pageName) {
+            var unHef = pageName.replace('-', ' ');
+            $('#nav').append('<a href="' + pageName + '">' + unHef + '</a>');
           };
-          var nearestTo;
+          var pagesToRender = (!app.state.isLoggedIn) ? ['home', 'signup'] : ['home', 'your-portal', 'conquer-cities', 'leaderboard'];
+          pagesToRender.forEach(renderSingle);
+        },
+        becomeLoggedIn: function() {
 
-          // step 1: get current location
-          ['curCity', 'nearbyCities'].forEach(function(id) {
-            spinners.push(new loadingSpinner($('#' + id)));
+          app.set({ isLoggedIn: true });
+          app.cue('global.renderNavMenu');
+
+          socket.on('pointsUpdate', function(data) {
+            console.log('updated points', data);
+            app.set({ points: data });
           });
 
-          locationModule.getCurrentCity(function(nearestCity, fiveOthers) {
-            spinners.stop();
-            if (nearestCity) {
-              nearestTo = nearestCity;
-              $('#curCity').text(nearestCity.cityname);
-              $('#nearbyCities').text(fiveOthers.join(', '));
+          socket.emit('getfullleaderboard');
 
-              setTimeout(stepTwo, 1000);
+          socket.on('top10', function(data) {
+            console.log('top10', data);
+            app.pages.leaderboard.renderTop10(data);
+          });
+
+          socket.on('top10scoreupdate', function(row) {
+            app.pages.leaderboard.updateScore(row);
+          });
+
+        }
+      },
+      init: function() {
+
+        $('button').on('click', function(e) {
+          e.preventDefault();
+        });
+
+        var onLoad = function() {
+          (function getPageFromUrl() {
+            var page = window.location.pathname.substring(1);
+            var defaultPage = (app.state.isLoggedIn) ? 'your-portal' : 'home';
+            if (Object.keys(app.pages).indexOf(page) !== -1 && page !== 'error') {
+              page = (app.pages[page].protected && !app.state.isLoggedIn) ? defaultPage : page;
+            } else {
+              page = defaultPage;
+            }
+            app.navigate.goTo(page);
+          })();
+          $('#container').show();
+        };
+
+        if (!navigator.geolocation) {
+          app.navigate.goTo('error', 'You must have geolocation capabilities for this website.  Unfortunately it looks like you do not have that capability.');
+        }
+
+        if (docCookies.hasItem('accountinfo')) {
+          // returning user
+          var savedInfo = JSON.parse(docCookies.getItem('accountinfo'));
+          socket.emit('verifyUser', savedInfo);
+          console.log('verifing player credentials');
+          socket.once('userResponse', function(response) {
+            console.log('savedinfo: ' + JSON.stringify(savedInfo));
+            console.log('response: ' + JSON.stringify(response));
+            if (response) {
+              app.set(Object.assign({}, savedInfo, response));
+              console.log(app.state);
+              app.cue('global.becomeLoggedIn');
+              onLoad();
+            } else {
+              onLoad();
+              app.navigate.goTo('error', 'Unable to log you in.  That\'s strange');
             }
           });
 
-          var stepTwo = function() {
-            // step two
-            $('#conquer-cities .step2').show();
-            spinners.push(new loadingSpinner($('#conquer-cities .step2 #curLeader')));
+        } else {
+          app.cue('global.renderNavMenu');
+          onLoad();
+        }
 
-            socket.emit('getCurrentLeader', nearestTo.cityid);
+      },
+      pages: {
+        error: {
+          init: function(message) {
+            app.navigate.hasErrored = true;
+            $('#error b').text(message);
+          }
+        },
+        home: {
+          init: function() {
+              $('#signUpCall').toggle(!app.state.isLoggedIn);
+          }
+        },
+        signup: {
+          init: function() {
+            // alert('sign up');
 
-            socket.once('currentLeaderFeedback', function(leader) {
-              spinners.stop();
-              $('#conquer-cities .step3').show();
-              if (!leader) {
-                $('#conquer-cities .step2 #curLeader').text('No current leader');
-                $('#conquer-cities .step3 #attackQ').text('Would you like to become leader of the city?');
-              } else if (leader === state.username) {
-                $('#conquer-cities .step3 #attackQ').text('You are already the leader of this city.  Go off and conquer more cities.');
-                $('#conquer-cities .step2 #curLeader').text(leader);
-                $('#conquer-cities .step3 #attackQ').addClass('green');
-                $('#conquer-cities .step3 button').hide();
-              } else {
-                $('#conquer-cities .step2 #curLeader').text(leader);
-                $('#conquer-cities .step3 #attackQ').text('Would you like to try to take over the city in a coup?');
-                $('#conquer-cities .step3 button').text('Click here to attack the leadership of ' + leader);
-              }
+            $('#getCurrentPosition').one('click', function() {
+
+              locationModule.getCurrentCity(function(nearestCity, fiveOthers) {
+                if (!nearestCity) {
+                  return $('#foundLocation').html('That\'s strange.  We were unable to find you');
+                }
+                var html = 'Great! Your geolocation seems to be working well.<br>We found you in ' + nearestCity.cityname + '.';
+                html += (fiveOthers.length) ? '<br>Cities nearby: ' + fiveOthers.join(', ') : '';
+                $('#foundLocation').html(html);
+                $('#join').show();
+                $('#getCurrentPosition').remove();
+              });
+
             });
 
-            $('#conquer-cities button').one('click', function() {
-              console.log('conqieruing')
-              socket.emit('conquerCity', nearestTo);
+            $('#join').one('click', function() {
+              var username = $('#username').val();
+              var locationString = app.state.location.nearestCity.cityname + ', ' + app.state.location.nearestCity.admincode + ' (' + app.state.location.nearestCity.country + ')';
 
-              spinners.push(new loadingSpinner($('#conquer-cities #attackResults')));
+              socket.emit('newUser', {
+                username: username,
+                lat: app.state.location.lat,
+                long: app.state.location.long,
+                nearestCity: locationString
+              });
 
-              socket.once('conquerResponse', function(data) {
-                spinners.stop();
+              socket.once('createUserError', function(errText) {
+                $('#createUserFeedback').text(errText).addClass("red");
+              });
+
+              socket.once('createUserSuccess', function(data) {
                 console.log(data);
-                $('#conquer-cities #attackResults').html('Congrats, you are now the leader of ' + data.cityname + ' and you will accumulate 10 points every hour.  But don\'t stop here.  Go out and conquer more lands');
+                $('#createUserFeedback').text('Successfully created your account.').addClass("green");
+                app.set(Object.assign({}, app.state, data));
+                docCookies.setItem('accountinfo', JSON.stringify(data));
+                app.cue('global.becomeLoggedIn');
+                setTimeout(function() {
+                  app.navigate.goTo('your-portal');
+                }, 1000);
               });
             });
 
           }
+        },
+        'your-portal': {
+          protected: true,
+          dom: {
+            myPoints: {
+              el: '#myPoints',
+              map: 'points'
+            }
+          },
+          init: function() {
+            $('.username').text(app.state.username);
+          }
+        },
+        'conquer-cities': {
+          protected: true,
+          init: function() {
+            $('#conquer-cities [class^=step').hide();
+            $('#conquer-cities .step1').show();
+
+            var spinners = [];
+            spinners.stop = function() {
+              this.forEach(function(spinner) {
+                spinner.doneLoading();
+              });
+            };
+            var nearestTo;
+
+            // step 1: get current location
+            ['curCity', 'nearbyCities'].forEach(function(id) {
+              spinners.push(new loadingSpinner($('#' + id)));
+            });
+
+            locationModule.getCurrentCity(function(nearestCity, fiveOthers) {
+              spinners.stop();
+              if (nearestCity) {
+                nearestTo = nearestCity;
+                $('#curCity').text(nearestCity.cityname);
+                $('#nearbyCities').text(fiveOthers.join(', '));
+
+                setTimeout(stepTwo, 1000);
+              }
+            });
+
+            var stepTwo = function() {
+              // step two
+              $('#conquer-cities .step2').show();
+              spinners.push(new loadingSpinner($('#conquer-cities .step2 #curLeader')));
+
+              socket.emit('getCurrentLeader', nearestTo.cityid);
+
+              socket.once('currentLeaderFeedback', function(leader) {
+                spinners.stop();
+                $('#conquer-cities .step3').show();
+                if (!leader) {
+                  $('#conquer-cities .step2 #curLeader').text('No current leader');
+                  $('#conquer-cities .step3 #attackQ').text('Would you like to become leader of the city?');
+                } else if (leader === app.state.username) {
+                  $('#conquer-cities .step3 #attackQ').text('You are already the leader of this city.  Go off and conquer more cities.');
+                  $('#conquer-cities .step2 #curLeader').text(leader);
+                  $('#conquer-cities .step3 #attackQ').addClass('green');
+                  $('#conquer-cities .step3 button').hide();
+                } else {
+                  $('#conquer-cities .step2 #curLeader').text(leader);
+                  $('#conquer-cities .step3 #attackQ').text('Would you like to try to take over the city in a coup?');
+                  $('#conquer-cities .step3 button').text('Click here to attack the leadership of ' + leader);
+                }
+              });
+
+              $('#conquer-cities button').one('click', function() {
+                console.log('conqieruing')
+                socket.emit('conquerCity', nearestTo);
+
+                spinners.push(new loadingSpinner($('#conquer-cities #attackResults')));
+
+                socket.once('conquerResponse', function(data) {
+                  spinners.stop();
+                  console.log(data);
+                  $('#conquer-cities #attackResults').html('Congrats, you are now the leader of ' + data.cityname + ' and you will accumulate 10 points every hour.  But don\'t stop here.  Go out and conquer more lands');
+                });
+              });
+
+            }
+
+          }
+        },
+        'leaderboard': {
+
+          renderTop10: function(data) {
+            var $tbody = $('#leaderboard tbody');
+            data.forEach(function(row) {
+              $tbody.append('<tr><td>' + row.username + '</td><td>' + row.points + '</td></tr>');
+            });
+          },
+
+          updateScore: function(row) {
+            $('#leaderboard td:contains(' + row.username + ')').parent().html('<td>' + row.username + '</td><td>' + row.points + '</td>');
+          }
 
         }
       }
-    };
 
+    });
 
-    var renderNavMenu = function() {
-      $('#nav').empty();
-
-      var renderSingle = function(pageName) {
-        var unHef = pageName.replace('-', ' ');
-        $('#nav').append('<a href="javascript:navigate.goTo(\'' + pageName + '\')">' + unHef + '</a>');
-      };
-
-      var pagesToRender = (!state.isLoggedIn) ? ['home', 'signup'] : ['home', 'your-portal', 'conquer-cities', 'leaderboard'];
-      pagesToRender.forEach(renderSingle);
-    };
-
-
-    (function initApp() {
-
-      var onLoad = function() {
-        (function getPageFromUrl() {
-          var page = window.location.pathname.substring(1);
-          var defaultPage = (state.isLoggedIn) ? 'your-portal' : 'home';
-          if (Object.keys(pages).indexOf(page) !== -1 && page !== 'error') {
-            page = (pages[page].protected) ? defaultPage : page;
-          } else {
-            page = defaultPage;
-          }
-          navigate.goTo(page);
-        })();
-        $('#container').show();
-      };
-
-      if (!navigator.geolocation) {
-        navigate.goTo('error', 'You must have geolocation capabilities for this website.  Unfortunately it looks like you do not have that capability.');
-      }
-
-      if (docCookies.hasItem('accountinfo')) {
-
-        // returning user
-        var savedInfo = JSON.parse(docCookies.getItem('accountinfo'));
-        socket.emit('verifyUser', savedInfo);
-        console.log('verifing player credentials');
-        socket.once('userResponse', function(response) {
-          console.log('savedinfo: ' + JSON.stringify(savedInfo));
-          console.log('response: ' + JSON.stringify(response));
-          if (response) {
-            state = Object.assign({}, savedInfo, response);
-            console.log(state);
-            becomeLoggedIn();
-            onLoad();
-          } else {
-            onLoad();
-            navigate.goTo('error', 'Unable to log you in.  That\'s strange');
-          }
-        });
-
-      } else {
-        renderNavMenu();
-        onLoad();
-      }
-
-    })();
-
-
+    app.init();
 
   })();
+
+
+
+
+  function johnsFramework(app) {
+
+    // register all page dom elements to watch for when state changes
+    var $watchState = {};
+    (function registerWatchStateVars() {
+      Object.keys(app.pages).map(function(pageName) {
+        var page = app.pages[pageName];
+        if (page.dom) {
+          Object.keys(page.dom).forEach(function(dom) {
+            var domObj = page.dom[dom];
+            app.pages[pageName]['$' + dom] = $(domObj.el);
+            $watchState[domObj.map] = app.pages[pageName]['$' + dom];
+          });
+        }
+        return page;
+      });
+    })();
+
+    // when setting update innerhtml of related fields
+    app.set = function(stateUpdate) {
+      Object.keys(stateUpdate).forEach(function(stateKey) {
+        if ($watchState[stateKey]) {
+          $watchState[stateKey].html(stateUpdate[stateKey]);
+        }
+      });
+      app.state = Object.assign({}, app.state, stateUpdate);
+    };
+
+    app.cue = function(what) {
+      var split = what.split('.');
+      var page = split[0];
+      var fnName = split[1];
+      console.log('cueing ' + page + ' ' + fnName);
+      app[page][fnName]();
+    };
+
+    app.navigate = {
+      hasErrored: false,
+      pagesVisited: {},
+      goTo: function(page, value) {
+        if (this.hasErrored) return;
+
+        $('.page').hide();
+
+        if (app.pages[page] && app.pages[page].init && !this.pagesVisited[page]) {
+          // only runs the first time the page is accessed
+          app.pages[page].init(value);
+        }
+
+        $('#' + page + '.page').show();
+
+        // updates navigation with selected currentPage
+        var unHef = page.replace('-', ' ');
+        $('#nav a').removeClass('currentPage');
+        $('#nav a:contains(' + unHef + ')').addClass("currentPage");
+
+        history.pushState({}, unHef, page);
+        this.pagesVisited[page] = true;
+      }
+    };
+
+    $('#nav').on('click', 'a', function(e) {
+      var href = $(this).attr('href');
+      app.navigate.goTo(href);
+      e.preventDefault();
+    });
+
+    return app;
+
+  }
 
 
 

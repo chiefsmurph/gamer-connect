@@ -408,6 +408,10 @@ io.sockets.on('connection', function (socket) {
   });
 
 
+  socket.on('getfullleaderboard', function() {
+    socket.emit('top10', pointsManager.leaderboard.getTop10());
+  });
+
   socket.on('disconnect', function() {
     pointsManager.handleDisconnect(user.playerid);
   });
@@ -418,33 +422,62 @@ io.sockets.on('connection', function (socket) {
 var pointsManager = (function() {
   var playerDb = {};
 
-  var addScoreIncrease = function(claimid, cityid, playerid) {
-    console.log(claimid, cityid, playerid);
-    playerDb[playerid].timeouts.push({
-      cityid: cityid,
-      timeout: new setInterval(function() {
-
-        console.log('incrementing points for ' + playerid);
-        // increment city_people.points
-        dbFunctions.incrementPlayer(playerid, function(data) {
-          if (!data) { return console.log('uh oh error updating player'); }
-          var newUserpoints = data.points;
-          // increment land_claims.points
-          dbFunctions.incrementLandClaim(claimid, function(data) {
-            if (!data) { return console.log('uh oh error updating land claim'); }
-            // socket emit points increase
-            if (playerDb[playerid].socket) {
-              console.log('sent pointsupdate');
-              playerDb[playerid].socket.emit('pointsUpdate', newUserpoints);
-            }
-            console.log('succesfully updated points for player ' + playerid);
-          });
-        });
-      }, 10000),
-    });
-  };
-
   return {
+    leaderboard: (function() {
+      var data = [];
+      return {
+        add: function(playerObj) {
+          data.push(playerObj);
+          data.sort(function(a, b) {
+            return a.points < b.points;
+          });
+        },
+        update: function(playerid, newscore) {
+          data.filter(function(obj) {
+            return obj.playerid === playerid;
+          })[0].points = newscore;
+          console.log('updated ');
+          console.log(data);
+
+          var top10 = this.getTop10();
+          if (newscore > top10[top10.length - 1].points) {
+            io.sockets.emit('top10scoreupdate', {
+              username: playerDb[playerid].username,
+              points: newscore
+            });
+          }
+        },
+        getTop10: function() {
+          return data.slice(0, 10);
+        }
+      }
+    })(),
+    addScoreIncrease: function(claimid, cityid, playerid) {
+      console.log(claimid, cityid, playerid);
+      playerDb[playerid].timeouts.push({
+        cityid: cityid,
+        timeout: new setInterval(function() {
+
+          console.log('incrementing points for ' + playerid);
+          // increment city_people.points
+          dbFunctions.incrementPlayer(playerid, function(data) {
+            if (!data) { return console.log('uh oh error updating player'); }
+            var newUserpoints = data.points;
+            // increment land_claims.points
+            dbFunctions.incrementLandClaim(claimid, function(data) {
+              if (!data) { return console.log('uh oh error updating land claim'); }
+              // socket emit points increase
+              if (playerDb[playerid].socket) {
+                console.log('sent pointsupdate');
+                playerDb[playerid].socket.emit('pointsUpdate', newUserpoints);
+              }
+              pointsManager.leaderboard.update(playerid, newUserpoints);
+              console.log('succesfully updated points for player ' + playerid);
+            });
+          });
+        }, 10000),
+      });
+    },
     init: function() {
       dbFunctions.getAllPlayers(function(players) {
         console.log('all players: ');
@@ -456,14 +489,20 @@ var pointsManager = (function() {
           playerDb[player.playerid].timeouts = [];
           playerDb[player.playerid].points = player.points;
           playerDb[player.playerid].username = player.username;
+
+          pointsManager.leaderboard.add({
+            playerid: player.playerid,
+            username: player.username,
+            points: player.points
+          });
         });
 
         dbFunctions.getAllLandClaims(function(claims) {
           console.log(claims);
           claims.forEach(function(claim) {
-            addScoreIncrease(claim.claimid, claim.cityid, claim.leaderid);
-          });
-        });
+            pointsManager.addScoreIncrease(claim.claimid, claim.cityid, claim.leaderid);
+          }.bind(this));
+        }.bind(this));
 
 
       });
@@ -475,6 +514,11 @@ var pointsManager = (function() {
         points: 0,
         timeouts: []
       };
+      this.leaderboard.add({
+        playerid: playerid,
+        username: username,
+        points: 0
+      });
     },
     loginUser: function(playerid, socket) {
       if (!playerDb[playerid]) {
@@ -485,7 +529,7 @@ var pointsManager = (function() {
     registerNewLeader(claimid, cityid, playerid) {
       console.log('registering new leader ', cityid, playerid);
       // when land_claims db has been updated and there was no previous leader
-      addScoreIncrease(claimid, cityid, playerid);
+      this.addScoreIncrease(claimid, cityid, playerid);
     },
     handleDisconnect: function(playerid) {
       if (playerDb[playerid]) playerDb[playerid].socket = null;
