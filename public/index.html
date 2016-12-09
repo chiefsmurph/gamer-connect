@@ -165,7 +165,7 @@
   <!-- javascript includes -->
   <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-  
+
   <script>
   var loadingSpinner = function($where) {
     $where.html('<img src="/img/loading.gif" class="spinner" />');
@@ -272,7 +272,7 @@
           app.navigate.goTo('error', 'You must have geolocation capabilities for this website.  Unfortunately it looks like you do not have that capability.');
         }
 
-        var accountInfo = localstorage.getItem('accountinfo');
+        var accountInfo = localStorage.getItem('accountinfo');
         if (accountInfo) {
           // returning user
           var savedInfo = JSON.parse(accountInfo);
@@ -349,7 +349,7 @@
                 console.log(data);
                 $('#createUserFeedback').text('Successfully created your account.').addClass("green");
                 app.set(Object.assign({}, app.state, data));
-                localstorage.setItem('accountinfo', JSON.stringify(data));
+                localStorage.setItem('accountinfo', JSON.stringify(data));
                 app.cue('global.becomeLoggedIn');
                 setTimeout(function() {
                   app.navigate.goTo('your-portal');
