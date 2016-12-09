@@ -38,7 +38,16 @@
   }
   #container {
     display: none;
+    font-size: 130%;
   }
+
+  @media (max-width: 800px) {
+    #container {
+      font-size: 18px;
+    }
+  }
+
+
   form {
 
   }
@@ -84,7 +93,6 @@
   #leaderboard thead {
     letter-spacing: 2px;
   }
-
   .datagrid table { border-collapse: collapse; text-align: left; width: 100%; } .datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: #fff; overflow: hidden; border: 1px solid #006699; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }.datagrid table td, .datagrid table th { padding: 3px 10px; }.datagrid table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; color:#ffffff; font-weight: bold; border-left: 1px solid #0070A8; } .datagrid table thead th:first-child { border: none; }.datagrid table tbody td { color: #00496B; border-left: 1px solid #E1EEF4;font-weight: normal; }.datagrid table tbody .alt td { background: #E1EEF4; color: #00496B; }.datagrid table tbody td:first-child { border-left: none; }.datagrid table tbody tr:last-child td { border-bottom: none; }.datagrid table tfoot td div { border-top: 1px solid #006699;background: #E1EEF4;} .datagrid table tfoot td { padding: 0; font-size: 12px } .datagrid table tfoot td div{ padding: 2px; }.datagrid table tfoot td ul { margin: 0; padding:0; list-style: none; text-align: right; }.datagrid table tfoot  li { display: inline; }.datagrid table tfoot li a { text-decoration: none; display: inline-block;  padding: 2px 8px; margin: 1px;color: #FFFFFF;border: 1px solid #006699;-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; }.datagrid table tfoot ul.active, .datagrid table tfoot ul a:hover { text-decoration: none;border-color: #006699; color: #FFFFFF; background: none; background-color:#00557F;}div.dhtmlx_window_active, div.dhx_modal_cover_dv { position: fixed !important; }
   </style>
 
@@ -102,7 +110,7 @@
 
     <div id="home" class="page">
       <h2>Welcome to City Leaders</h2>
-      <p>A location-based game where the goal is to accrue as many points as possible by becoming the City Leader of your current city.  Every hour that goes by that you are the City Leader you get 10 points.  And you can be the Leader of more than one city at a time.  But be careful or else other players will attack and try to coop your leadership.  Cities that are in contention are ones that have a population of more than 1,000 people.</p>
+      <p>A location-based game where the goal is to accrue as many points as possible by becoming the City Leader of your current city.  Every hour that goes by that you are the City Leader you get 10 points.  And you can be the Leader of more than one city at a time.  be careful as other players from your same city will attack and try to coop your leadership.  Cities that are in contention are ones that have a population of more than 1,000 people and you must be located in or near the city to become leader.</p>
       <div id="signUpCall"><a href="signup">Click here to sign up</a></div>
     </div>
 
@@ -157,81 +165,7 @@
   <!-- javascript includes -->
   <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-  <script>
-
-  /*\
-  |*|
-  |*|  :: cookies.js ::
-  |*|
-  |*|  A complete cookies reader/writer framework with full unicode support.
-  |*|
-  |*|  https://developer.mozilla.org/en-US/docs/DOM/document.cookie
-  |*|
-  |*|  This framework is released under the GNU Public License, version 3 or later.
-  |*|  http://www.gnu.org/licenses/gpl-3.0-standalone.html
-  |*|
-  |*|  Syntaxes:
-  |*|
-  |*|  * docCookies.setItem(name, value[, end[, path[, domain[, secure]]]])
-  |*|  * docCookies.getItem(name)
-  |*|  * docCookies.removeItem(name[, path], domain)
-  |*|  * docCookies.hasItem(name)
-  |*|  * docCookies.keys()
-  |*|
-  \*/
-
-  var docCookies = {
-    getItem: function (sKey) {
-      if (!sKey) { return null; }
-      return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
-    },
-    setItem: function (sKey, sValue, vEnd, sPath, sDomain, bSecure) {
-      if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) { return false; }
-      var sExpires = "";
-      if (vEnd) {
-        switch (vEnd.constructor) {
-          case Number:
-            sExpires = vEnd === Infinity ? "; expires=Fri, 31 Dec 9999 23:59:59 GMT" : "; max-age=" + vEnd;
-            break;
-          case String:
-            sExpires = "; expires=" + vEnd;
-            break;
-          case Date:
-            sExpires = "; expires=" + vEnd.toUTCString();
-            break;
-        }
-      }
-      document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + (bSecure ? "; secure" : "");
-      return true;
-    },
-    removeItem: function (sKey, sPath, sDomain) {
-      if (!sKey || !this.hasItem(sKey)) { return false; }
-      document.cookie = encodeURIComponent(sKey) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + ( sDomain ? "; domain=" + sDomain : "") + ( sPath ? "; path=" + sPath : "");
-      return true;
-    },
-    hasItem: function (sKey) {
-      return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
-    },
-    keys: /* optional method: you can safely remove it! */ function () {
-      var aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/);
-      for (var nIdx = 0; nIdx < aKeys.length; nIdx++) { aKeys[nIdx] = decodeURIComponent(aKeys[nIdx]); }
-      if (!this.hasItem(sKey)) { return false; }
-      document.cookie = encodeURIComponent(sKey) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "");
-      return true;
-    },
-    hasItem: function (sKey) {
-      if (!sKey) { return false; }
-      return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
-    },
-    keys: function () {
-      var aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/);
-      for (var nLen = aKeys.length, nIdx = 0; nIdx < nLen; nIdx++) { aKeys[nIdx] = decodeURIComponent(aKeys[nIdx]); }
-      return aKeys;
-    }
-  };
-
-  </script>
-
+  
   <script>
   var loadingSpinner = function($where) {
     $where.html('<img src="/img/loading.gif" class="spinner" />');
@@ -305,7 +239,7 @@
 
           socket.on('top10', function(data) {
             console.log('top10', data);
-            app.pages.leaderboard.renderTop10(data);
+            app.pages.leaderboard.setAndRender(data);
           });
 
           socket.on('top10scoreupdate', function(row) {
@@ -338,9 +272,10 @@
           app.navigate.goTo('error', 'You must have geolocation capabilities for this website.  Unfortunately it looks like you do not have that capability.');
         }
 
-        if (docCookies.hasItem('accountinfo')) {
+        var accountInfo = localstorage.getItem('accountinfo');
+        if (accountInfo) {
           // returning user
-          var savedInfo = JSON.parse(docCookies.getItem('accountinfo'));
+          var savedInfo = JSON.parse(accountInfo);
           socket.emit('verifyUser', savedInfo);
           console.log('verifing player credentials');
           socket.once('userResponse', function(response) {
@@ -414,7 +349,7 @@
                 console.log(data);
                 $('#createUserFeedback').text('Successfully created your account.').addClass("green");
                 app.set(Object.assign({}, app.state, data));
-                docCookies.setItem('accountinfo', JSON.stringify(data));
+                localstorage.setItem('accountinfo', JSON.stringify(data));
                 app.cue('global.becomeLoggedIn');
                 setTimeout(function() {
                   app.navigate.goTo('your-portal');
@@ -510,15 +445,36 @@
         },
         'leaderboard': {
 
-          renderTop10: function(data) {
+          'top10': [],
+
+          renderTop10: function() {
             var $tbody = $('#leaderboard tbody');
-            data.forEach(function(row) {
+            $tbody.empty();
+            this.top10.forEach(function(row) {
               $tbody.append('<tr><td>' + row.username + '</td><td>' + row.points + '</td></tr>');
             });
           },
 
+          setAndRender: function(data) {
+            this.top10 = data;
+            this.renderTop10();
+          },
+
           updateScore: function(row) {
-            $('#leaderboard td:contains(' + row.username + ')').parent().html('<td>' + row.username + '</td><td>' + row.points + '</td>');
+            console.log(row);
+            var foundScore = this.top10.filter(function(data) {
+              return data.username === row.username;
+            });
+            debugger;
+            if (foundScore.length) {
+              foundScore[0].points = row.points;
+            } else {
+              this.top10.push(row);
+              this.top10.sort(function(a, b) {
+                return a.points > b.points;
+              });
+            }
+            this.renderTop10();
           }
 
         }
