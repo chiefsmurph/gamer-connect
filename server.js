@@ -442,7 +442,8 @@ var pointsManager = (function() {
           console.log(data);
 
           var top10 = this.getTop10();
-          if (newscore > top10[top10.length - 1].points) {
+          console.log('top10 gotten', top10[top10.length - 1].points, newscore);
+          if (newscore >= top10[top10.length - 1].points) {
             io.sockets.emit('top10scoreupdate', {
               username: playerDb[playerid].username,
               points: newscore
@@ -450,7 +451,9 @@ var pointsManager = (function() {
           }
         },
         getTop10: function() {
-          return data.slice(0, 10);
+          return data.filter(function(data) {
+            return data.points > 0;
+          }).slice(0, 10);
         }
       }
     })(),

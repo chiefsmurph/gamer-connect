@@ -5,6 +5,12 @@
   h1, p {
     margin: 0;
   }
+  h1 {
+    margin-bottom: 10px;
+  }
+  h2 {
+    margin: 0 0 10px 0;
+  }
   p {
     margin-bottom: 1em;
   }
@@ -30,13 +36,14 @@
     text-align: center;
     color: blue;
   }
-  a:visited: {
+  a:visited {
     color: blue;
   }
   #nav a:hover {
     background-color: #ccc;
   }
   #nav a.currentPage {
+    cursor: default;
     background-color: #ccc;
   }
   #container {
@@ -48,14 +55,20 @@
     #container {
       font-size: 18px;
     }
+    #nav a {
+      font-size: 3.5vw;
+      padding: 1vw;
+    }
   }
 
 
   form {
 
   }
-  label input {
+  label input#username {
     margin-left: 10px;
+    padding: 2px 10px;
+    font-size: 22px;
   }
   button {
     font-size: 16px;
@@ -79,6 +92,9 @@
     font-size: 135%;
     color: green;
   }
+  #curLeader {
+    font-size: 150%;
+  }
   #nearbyCallout {
     font-size: 80%;
     color: grey;
@@ -96,7 +112,10 @@
   #leaderboard thead {
     letter-spacing: 2px;
   }
-  .datagrid table { border-collapse: collapse; text-align: left; width: 100%; } .datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: #fff; overflow: hidden; border: 1px solid #006699; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }.datagrid table td, .datagrid table th { padding: 3px 10px; }.datagrid table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; color:#ffffff; font-weight: bold; border-left: 1px solid #0070A8; } .datagrid table thead th:first-child { border: none; }.datagrid table tbody td { color: #00496B; border-left: 1px solid #E1EEF4;font-weight: normal; }.datagrid table tbody .alt td { background: #E1EEF4; color: #00496B; }.datagrid table tbody td:first-child { border-left: none; }.datagrid table tbody tr:last-child td { border-bottom: none; }.datagrid table tfoot td div { border-top: 1px solid #006699;background: #E1EEF4;} .datagrid table tfoot td { padding: 0; font-size: 12px } .datagrid table tfoot td div{ padding: 2px; }.datagrid table tfoot td ul { margin: 0; padding:0; list-style: none; text-align: right; }.datagrid table tfoot  li { display: inline; }.datagrid table tfoot li a { text-decoration: none; display: inline-block;  padding: 2px 8px; margin: 1px;color: #FFFFFF;border: 1px solid #006699;-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; }.datagrid table tfoot ul.active, .datagrid table tfoot ul a:hover { text-decoration: none;border-color: #006699; color: #FFFFFF; background: none; background-color:#00557F;}div.dhtmlx_window_active, div.dhx_modal_cover_dv { position: fixed !important; }
+  #attackResults {
+    margin-top: 1em;
+  }
+  .datagrid table { border-collapse: collapse; text-align: left; width: 100%; font-size: 80%; } .datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: #fff; overflow: hidden; border: 1px solid #006699; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }.datagrid table td, .datagrid table th { padding: 3px 10px; }.datagrid table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; color:#ffffff; font-weight: bold; border-left: 1px solid #0070A8; } .datagrid table thead th:first-child { border: none; }.datagrid table tbody td { color: #00496B; border-left: 1px solid #E1EEF4;font-weight: normal; }.datagrid table tbody .alt td { background: #E1EEF4; color: #00496B; }.datagrid table tbody td:first-child { border-left: none; }.datagrid table tbody tr:last-child td { border-bottom: none; }.datagrid table tfoot td div { border-top: 1px solid #006699;background: #E1EEF4;} .datagrid table tfoot td { padding: 0; } .datagrid table tfoot td div{ padding: 2px; }.datagrid table tfoot td ul { margin: 0; padding:0; list-style: none; text-align: right; }.datagrid table tfoot  li { display: inline; }.datagrid table tfoot li a { text-decoration: none; display: inline-block;  padding: 2px 8px; margin: 1px;color: #FFFFFF;border: 1px solid #006699;-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; }.datagrid table tfoot ul.active, .datagrid table tfoot ul a:hover { text-decoration: none;border-color: #006699; color: #FFFFFF; background: none; background-color:#00557F;}div.dhtmlx_window_active, div.dhx_modal_cover_dv { position: fixed !important; }
   </style>
 
   <link href='https://fonts.googleapis.com/css?family=Audiowide' rel='stylesheet' type='text/css'>
@@ -120,7 +139,7 @@
     <div id="signup" class="page">
       <h2>Join the competition</h2>
       <form>
-        <label>Username<input type="text" id="username"/></label><br><br>
+        <label>Username<input type="text" id="username" maxlength="14" autofocus/></label><br><br>
         <button id="getCurrentPosition">Test your geolocation capabilities</button>
         <div id="foundLocation"></div><br>
         <button id="join">Click here to create your account</button>
@@ -191,6 +210,11 @@
           };
           app.set(locObj);
           socket.emit('citiesNearby', locObj);
+        },function (error) {
+          if (error.code == error.PERMISSION_DENIED) {
+            console.log("you denied me :-(");
+            callback(null, null, true);
+          }
         });
 
         socket.once('citiesNearbyResults', function(nearbyCities) {
@@ -246,6 +270,7 @@
           });
 
           socket.on('top10scoreupdate', function(row) {
+            console.log('rowwww', row)
             app.pages.leaderboard.updateScore(row);
           });
 
@@ -314,29 +339,41 @@
           }
         },
         signup: {
+          dom: {
+            username: {
+              el: '#username'
+            }
+          },
           init: function() {
             // alert('sign up');
 
             $('#getCurrentPosition').one('click', function() {
 
-              locationModule.getCurrentCity(function(nearestCity, fiveOthers) {
+              var loading = new loadingSpinner($('#foundLocation'));
+
+              locationModule.getCurrentCity(function(nearestCity, fiveOthers, err) {
+                if (err) {
+                  return $('#foundLocation').html('Looks like you have geolocation capabilities but have been disabled for this website or app.  Look for your location settings and try again.').addClass('red');
+                }
                 if (!nearestCity) {
-                  return $('#foundLocation').html('That\'s strange.  We were unable to find you');
+                  return $('#foundLocation').html('That\'s strange.  We were unable to find you.  Go somewhere else.').addClass('red');
                 }
                 var html = 'Great! Your geolocation seems to be working well.<br>We found you in ' + nearestCity.cityname + '.';
                 html += (fiveOthers.length) ? '<br>Cities nearby: ' + fiveOthers.join(', ') : '';
-                $('#foundLocation').html(html);
+                $('#foundLocation').html(html).removeClass('red').addClass('green');
                 $('#join').show();
                 $('#getCurrentPosition').remove();
               });
 
             });
 
+            var $username = this.$username;
+            $username.focus();
             $('#join').one('click', function() {
-              debugger;
-              var username = $('#username').val();
+
+              var username = $username.val();
               var locationString = app.state.nearestCity.cityname + ', ' + app.state.nearestCity.admincode + ' (' + app.state.nearestCity.country + ')';
-              debugger;
+
               socket.emit('newUser', {
                 username: username,
                 lat: app.state.lat,
@@ -368,10 +405,14 @@
             myPoints: {
               el: '#myPoints',
               map: 'points'
+            },
+            username: {
+              el: '.username',
+              map: 'username'
             }
           },
           init: function() {
-            $('.username').text(app.state.username);
+            // $('.username').text(app.state.username);
           }
         },
         'conquer-cities': {
@@ -438,7 +479,7 @@
                 socket.once('conquerResponse', function(data) {
                   spinners.stop();
                   console.log(data);
-                  $('#conquer-cities #attackResults').html('Congrats, you are now the leader of ' + data.cityname + ' and you will accumulate 10 points every hour.  But don\'t stop here.  Go out and conquer more lands');
+                  $('#conquer-cities #attackResults').html('Congrats, you are now the leader of ' + data.cityname + ' and you will accumulate 10 points every hour.  But don\'t stop here.  Go out and conquer more lands').addClass('green');
                 });
               });
 
@@ -447,6 +488,7 @@
           }
         },
         'leaderboard': {
+          protected: true,
 
           'top10': [],
 
@@ -464,11 +506,10 @@
           },
 
           updateScore: function(row) {
-            console.log(row);
+            console.log('update score', row);
             var foundScore = this.top10.filter(function(data) {
               return data.username === row.username;
             });
-            debugger;
             if (foundScore.length) {
               foundScore[0].points = row.points;
             } else {
@@ -549,6 +590,7 @@
         $('#nav a:contains(' + unHef + ')').addClass("currentPage");
 
         history.pushState({}, unHef, page);
+        $(document).prop('title','City Leaders | ' + unHef);
         this.pagesVisited[page] = true;
       }
     };
