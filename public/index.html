@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>Cities distance</title>
+  <title>City Leaders</title>
   <Style>
   h1, p {
     margin: 0;
@@ -590,7 +590,13 @@
         $('#nav a:contains(' + unHef + ')').addClass("currentPage");
 
         history.pushState({}, unHef, page);
-        $(document).prop('title','City Leaders | ' + unHef);
+
+        function toTitleCase(str)
+        {
+            return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+        }
+
+        $(document).prop('title','City Leaders | ' + toTitleCase(unHef));
         this.pagesVisited[page] = true;
       }
     };
