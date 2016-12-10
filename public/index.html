@@ -452,10 +452,6 @@
 
                   $('#attackModal').show();
 
-                  setTimeout(function() {
-                    $('#attackModal').hide();
-                  }, 3500);
-
                   if (i === response.missedAttacks.length - 1) {
                     return;
                   }
@@ -650,9 +646,12 @@
                   socket.once('conquerResponse', function(data) {
                     spinners.stop();
                     console.log(data);
+                    $('#conquer-cities button.reset').show();
+                    if (!data) {
+                      return $('#conquer-cities #attackResults').html('Uh oh looks like someone else already snagged this city.').addClass('red');
+                    }
                     $('#conquer-cities #attackResults').html('Congrats!  You are now the leader of ' + data.cityname + ' and you will accumulate 10 points every hour.  But don\'t stop here.  Go out and conquer more lands').addClass('green');
                     app.cue('your-portal.updateCurrentCities', app.state.cities.concat([data.cityname]));
-                    $('#conquer-cities button.reset').show();
                   });
                 } else {
 
