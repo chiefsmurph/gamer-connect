@@ -223,7 +223,8 @@
   </div>
 
   <div class="modal" id="attackSuccess">
-    <h2>Congrats!  You were able to steal leadership of <span class="attackingCityName"></span> from <span class="attackingName"></span></h2>
+    <h1>Congrats!</h1>
+    <h2>You were able to steal leadership of <span class="attackingCityName"></span> from <span class="attackingName"></span></h2>
   </div>
 
   <div class="modal" id="dethroned">
@@ -649,7 +650,7 @@
                   socket.once('conquerResponse', function(data) {
                     spinners.stop();
                     console.log(data);
-                    $('#conquer-cities #attackResults').html('<h1>Congrats</h1>You are now the leader of ' + data.cityname + ' and you will accumulate 10 points every hour.  But don\'t stop here.  Go out and conquer more lands').addClass('green');
+                    $('#conquer-cities #attackResults').html('Congrats!  You are now the leader of ' + data.cityname + ' and you will accumulate 10 points every hour.  But don\'t stop here.  Go out and conquer more lands').addClass('green');
                     app.cue('your-portal.updateCurrentCities', app.state.cities.concat([data.cityname]));
                     $('#conquer-cities button.reset').show();
                   });
