@@ -287,7 +287,8 @@
     var socket = io.connect(window.location.hostname + ":" + window.location.port);
     var app = johnsFramework({
       state: {
-        isLoggedIn: false
+        isLoggedIn: false,
+        cities: []
       },
       global: {
         renderNavMenu: function() {
