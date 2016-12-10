@@ -646,6 +646,7 @@
                   socket.once('conquerResponse', function(data) {
                     spinners.stop();
                     console.log(data);
+                    $('#conquer-cities .step3 button').hide();
                     $('#conquer-cities button.reset').show();
                     if (!data) {
                       return $('#conquer-cities #attackResults').html('Uh oh looks like someone else already snagged this city.').addClass('red');
