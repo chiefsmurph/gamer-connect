@@ -442,12 +442,12 @@
                   }, 4200);
                 })(0);
               }
-              if (response.activeOutgoingAttacks && response.activeOutgoingAttacks.length) {
+              if (response.activeAttacksOutgoing && response.activeAttacksOutgoing.length) {
                 (function displayAttackingModal(i) {
 
                   app.set({
-                    attackingCityName: response.activeOutgoingAttacks[i].cityname,
-                    attackingName: response.activeOutgoingAttacks[i].attacking
+                    attackingCityName: response.activeAttacksOutgoing[i].cityname,
+                    attackingName: response.activeAttacksOutgoing[i].attacking
                   });
 
                   $('#attackModal').show();
