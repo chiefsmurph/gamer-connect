@@ -1,0 +1,241 @@
+<html>
+<head>
+  <title>City Leaders</title>
+  <Style>
+  h1, p {
+    margin: 0;
+  }
+  h1 {
+    margin-bottom: 10px;
+  }
+  h2 {
+    margin: 0 0 10px 0;
+  }
+  p {
+    margin-bottom: 1em;
+  }
+  #nearbyCitiesView {
+    display: none;
+  }
+  body * {
+    font-family: 'Audiowide', cursive;
+  }
+  body {
+    padding: 10px;
+  }
+  #nav {
+    display: flex;
+    justify-content: space-around;
+    margin: 0 -10px 10px;
+  }
+  #nav a {
+    background-color: #eee;
+    padding: 10px;
+    margin: 0.4vw;
+    flex-grow: 1;
+    text-align: center;
+    color: blue;
+  }
+  a:visited {
+    color: blue;
+  }
+  #nav a:hover {
+    background-color: #ccc;
+  }
+  #nav a.currentPage {
+    cursor: default;
+    background-color: #ccc;
+  }
+  #container {
+    display: none;
+    font-size: 130%;
+  }
+
+  @media (max-width: 800px) {
+    #container {
+      font-size: 18px;
+    }
+    #nav a {
+      font-size: 3.5vw;
+      padding: 1vw;
+    }
+  }
+
+
+  form {
+
+  }
+  label input#username {
+    margin-left: 10px;
+    padding: 2px 10px;
+    font-size: 22px;
+  }
+  button {
+    font-size: 21px;
+    padding: 5px 35px;
+  }
+  button#join {
+    display: none;
+    font-weight: bold;
+  }
+  #getCurrentPosition {
+    margin-bottom: 10px;
+  }
+  .red {
+    color: red;
+  }
+  .green {
+    color: green;
+  }
+  #curCity {
+    font-weight: bold;
+    font-size: 135%;
+    color: green;
+  }
+  #curLeader {
+    font-size: 150%;
+  }
+  #nearbyCallout {
+    font-size: 80%;
+    color: grey;
+    font-style: italic;
+  }
+  #your-portal #your-cities {
+    display: none;
+  }
+  #conquer-cities > div {
+    margin-bottom: 1em;
+  }
+  #conquer-cities button {
+    margin-top: 4px;
+  }
+  #leaderboard {
+    font-size: 150%;
+  }
+  #leaderboard thead {
+    letter-spacing: 2px;
+  }
+  #attackResults {
+    margin-top: 1em;
+  }
+  .datagrid table { border-collapse: collapse; text-align: left; width: 100%; font-size: 80%; } .datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: #fff; overflow: hidden; border: 1px solid #006699; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }.datagrid table td, .datagrid table th { padding: 3px 10px; }.datagrid table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; color:#ffffff; font-weight: bold; border-left: 1px solid #0070A8; } .datagrid table thead th:first-child { border: none; }.datagrid table tbody td { color: #00496B; border-left: 1px solid #E1EEF4;font-weight: normal; }.datagrid table tbody .alt td { background: #E1EEF4; color: #00496B; }.datagrid table tbody td:first-child { border-left: none; }.datagrid table tbody tr:last-child td { border-bottom: none; }.datagrid table tfoot td div { border-top: 1px solid #006699;background: #E1EEF4;} .datagrid table tfoot td { padding: 0; } .datagrid table tfoot td div{ padding: 2px; }.datagrid table tfoot td ul { margin: 0; padding:0; list-style: none; text-align: right; }.datagrid table tfoot  li { display: inline; }.datagrid table tfoot li a { text-decoration: none; display: inline-block;  padding: 2px 8px; margin: 1px;color: #FFFFFF;border: 1px solid #006699;-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; }.datagrid table tfoot ul.active, .datagrid table tfoot ul a:hover { text-decoration: none;border-color: #006699; color: #FFFFFF; background: none; background-color:#00557F;}div.dhtmlx_window_active, div.dhx_modal_cover_dv { position: fixed !important; }
+
+  .modal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    height: 70%;
+    background-color: rgba(0,200,10,0.9);
+    border-top: 10px solid green;
+    padding: 10px;
+    display: none;
+    text-align: center;
+  }
+
+  .modal.beingAttacked, .modal#attackFailed {
+    background-color: rgba(200,10,10,0.9);
+    border-top: 10px solid red;
+  }
+
+
+  </style>
+
+  <link href='https://fonts.googleapis.com/css?family=Audiowide' rel='stylesheet' type='text/css'>
+</head>
+<body>
+
+  <div id="container">
+
+    <h1>City Leaders</h1>
+    <div id="nav">
+      <a href="home">Home</a>
+      <a href="signup">Sign Up</a>
+    </div>
+
+    <div id="home" class="page">
+      <h2>Welcome to City Leaders</h2>
+      <p>A location-based game where the goal is to accrue as many points as possible by becoming the City Leader of your current city.  Every hour that goes by that you are the City Leader you get 10 points.  And you can be the Leader of more than one city at a time.  be careful as other players from your same city will attack and try to coop your leadership.  Cities that are in contention are ones that have a population of more than 1,000 people and you must be located in or near the city to become leader.</p>
+      <div id="signUpCall"><a href="signup">Click here to sign up</a></div>
+    </div>
+
+    <div id="signup" class="page">
+      <h2>Join the competition</h2>
+      <form>
+        <label>Username<input type="text" id="username" maxlength="14" autofocus/></label><br><br>
+        <button id="getCurrentPosition">Test your geolocation capabilities</button>
+        <div id="foundLocation"></div><br>
+        <button id="join">Click here to create your account</button>
+        <div id="createUserFeedback"></div>
+      </form>
+    </div>
+
+    <div id="your-portal" class="page">
+      <h2>Welcome <span class='username'></span></h2>
+      Your score: <span id="myPoints"></span>
+      <div id="your-cities">
+        Your cities:
+        <ul></ul>
+      </div>
+    </div>
+
+    <div id="conquer-cities" class="page">
+      <div class="step1">
+        Your current location: <span id="curCity"></span><br>
+        <span id="nearbyCallout">Nearby cities: <span id="nearbyCities"></span></span>
+      </div>
+      <div class="step2" id="currentLeader">
+        Current city leader: <span id="curLeader"></span>
+      </div>
+      <div class="step3">
+        <div id="attackQ"></div>
+        <button>Click here to take control of the city</button>
+        <div id="attackResults"></div>
+      </div>
+    </div>
+
+    <div id="leaderboard" class="page datagrid">
+      <table>
+        <thead>
+          <th>Username</th>
+          <th>Points</th>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="error" class="page">
+      <b style="color: red"></b>
+    </div>
+
+  </div>
+
+  <div class="modal" id="attackModal">
+    <h2>You are attacking <span class="attackingName"></span></h2>
+    ...to gain control of <span class="attackingCityName"></span>
+  </div>
+
+  <div class="modal" id="attackFailed">
+    <h2><span class="attackingName"></span> blocked your attack of <span class="attackingCityName"></span></h2>
+  </div>
+
+  <div class="modal" id="attackSuccess">
+    <h2>Congrats!  You were able to steal leadership of <span class="attackingCityName"></span> from <span class="attackingName"></span></h2>
+  </div>
+
+  <div class="modal" id="dethroned">
+    <h2>You have been dethroned of <span id="dethronedCity"></span></h2>
+  </div>
+
+  <!-- javascript includes -->
+  <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+  <script>
+  eval(function(p,a,c,k,e,d){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--){d[e(c)]=k[c]||e(c)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('4 16=3($2u){$2u.o(\'<2o 4a="/2o/2h.4u" 34="1L" />\');f.2B=3(){$2u.2F(\'2o.1L\').1s()}};(3(){4 26={2c:3(1W){2S.1n.2k(3 3S(2n){4 2y={2i:2n.3l.3N,2d:2n.3l.3M};2.H(2y);d.N(\'3R\',2y)},3(W){l(W.3y==W.3D){j.i("y 3A 3B :-(");1W(1U,1U,P)}});d.O(\'4j\',3(1o){j.i(1o);4 1V=1o.2D(0);l(!1V.1Y)n 1W(1U);4 k=1V.4h();4 12=1V.4n(3(2J,v){n 2J.3c([v.B])},[]).2D(0,5);2.H({k:k});1W(k,12)})}};4 d=4v.4r(2b.1H.4o+":"+2b.1H.4q);4 2=2K({c:{1e:2Z},Z:{2g:3(){$(\'#1A\').3m();4 3t=3(11){4 1b=11.2v(\'-\',\' \');$(\'#1A\').2w(\'<a 1r="\'+11+\'">\'+1b+\'</a>\')};4 3n=(!2.c.1e)?[\'1Z\',\'3h\']:[\'1Z\',\'p-F\',\'7-6\',\'1a\'];3n.1d(3t)},27:3(){2.H({1e:P});2.C(\'Z.2g\');d.x(\'3Z\',3(9){j.i(\'3U M\',9);2.H({M:9})});d.N(\'3V\');d.x(\'R\',3(9){j.i(\'R\',9);2.q.1a.2W(9)});d.x(\'4b\',3(A){j.i(\'48\',A)2.q.1a.2G(A)});4 21=3(J){$(\'#36\').44(4t,3(){$(\'#\'+J).r();1i(3(){2.C(\'7-6.1B\');2.2p(\'7-6\');2.I.T(\'p-F\');$(\'#\'+J).1g()},46)})};d.x(\'45\',3(14){j.i(\'47 49 43\',14);21(\'42\');2.C(\'p-F.1M\',2.c.6.3c([14.B]))});d.x(\'35\',3(){21(\'35\')});d.x(\'1u\',3(9){j.i(\'3b 39\',9);4 $K=$(\'<3o 34="K 1u">2H v 1c <b>\'+9.v.B+\'</b> 3W 3b 39 3X \'+9.3Y+\'<20><20><D>Y 22 V 41 40 4c</D></3o>\');$K.9(\'1z-1N\',9.2e).r();$(\'3q\').2w($K)});$(\'3q\').x(\'Y\',\'.K.1u D\',3(){4 $K=$(f).3v();4 2e=$K.9(\'1z-1N\');d.N(\'4d\',2e);d.O(\'4p\',3(){$K.1g();$K.1s()})});d.x(\'1X\',3(14){j.i(\'y 1p 3d 1X 1c \',14);2.C(\'p-F.1M\',2.c.6.2E(3(v){n v!==14.B}));$(\'.1u\').1s();$(\'#4s\').o(14.B);$(\'#1X\').r();1i(3(){$(\'#1X\').r()},2j);2.C(\'7-6.1B\');2.2p(\'7-6\');2.I.T(\'p-F\')})}},G:3(){$(\'D\').x(\'Y\',3(e){e.3f()});4 1x=3(){(3 3T(){4 8=2b.1H.4m.4g(1);4 29=(2.c.1e)?\'p-F\':\'1Z\';l(X.1P(2.q).4f(8)!==-1&&8!==\'W\'){8=(2.q[8].1y&&!2.c.1e)?29:8}Q{8=29}2.I.T(8)})();$(\'#4e\').r()};l(!2S.1n){2.I.T(\'W\',\'33 4i 1p 1n 3j 23 f 37.  4l 4k 4w 1D y 3G 3E 1p 3z 3P.\')}4 25=2U.3Q(\'2V\');l(25){4 1K=1E.3O(25);d.N(\'3I\',1K);j.i(\'3F 3H 3C\');d.O(\'3J\',3(J){j.i(\'3L: \'+1E.28(1K));j.i(\'J: \'+1E.28(J));l(J){2.H(X.2s({},1K,J));2.C(\'p-F.1M\',J.6);j.i(2.c);2.C(\'Z.27\');1x()}Q{1x();2.I.T(\'W\',\'3K V i y 2f.  3s\\\'s 3r\')}})}Q{2.C(\'Z.2g\');1x()}},q:{W:{G:3(3g){2.I.2r=P;$(\'#W b\').u(3g)}},1Z:{G:3(){$(\'#4J\').2M(!2.c.1e)}},3h:{E:{h:{17:\'#h\'}},G:3(){$(\'#2k\').3u(\'Y\',3(){4 2h=18 16($(\'#1C\'));26.2c(3(k,12,3i){l(3i){n $(\'#1C\').o(\'5t 1D y 1p 1n 3j 5s 1p 3d 5r 23 f 37 5q 2.  5u 23 p 1H 5v 1F 3p 5y.\').L(\'1S\')}l(!k){n $(\'#1C\').o(\'3s\\\'s 3r.  2P 5x 5w V 2F y.  2m 5p Q.\').L(\'1S\')}4 o=\'5o! 2H 1n 5i V 5h 5g 5f.<20>2P 5j y 2f \'+k.B+\'.\';o+=(12.1Y)?\'<20>5A 5n: \'+12.1j(\', \'):\'\';$(\'#1C\').o(o).2O(\'1S\').L(\'1l\');$(\'#1j\').r();$(\'#2k\').1s()})});4 $h=f.$h;$h.5m();$(\'#1j\').x(\'Y\',3(){4 2h=18 16($(\'#2a\'));4 h=$h.5l();4 24=2.c.k.B+\', \'+2.c.k.5z+\' (\'+2.c.k.5F+\')\';j.i(\'1j\',h,24);d.N(\'5N\',{h:h,2i:2.c.2i,2d:2.c.2d,k:24});d.O(\'5M\',3(2R){$(\'#2a\').u(2R).L("1S")});d.O(\'5L\',3(9){j.i(9);$(\'#2a\').u(\'5O 5P p 5S.\').L("1l");2.H(X.2s({},2.c,9));2U.5R(\'2V\',1E.28(9));2.C(\'Z.27\');1i(3(){2.I.T(\'p-F\')},2j)})})}},\'p-F\':{1y:P,E:{2Y:{17:\'#2Y\',15:\'M\'},h:{17:\'.h\',15:\'h\'}},G:3(){},1M:3(6){j.i(6,\'6\')$(\'#p-6\').2M(!!6.1Y);$(\'#p-6 5D\').o(6.15(3(v){n\'<32>\'+v+\'</32>\'}))}},\'7-6\':{1y:P,E:{1v:{17:\'.1v\',15:\'1v\'},1Q:{17:\'.1Q\',15:\'1Q\'}},G:3(){f.1B();4 U=[];U.1h=3(){f.1d(3(1L){1L.2B()})};[\'2L\',\'1o\'].1d(3(1N){U.1T(18 16($(\'#\'+1N)))});26.2c(3(k,12){U.1h();l(k){$(\'#2L\').u(k.B);$(\'#1o\').u(12.1j(\', \'));1i(2I,2j)}});4 2I=3(){$(\'#7-6 .19\').r();U.1T(18 16($(\'#7-6 .19 #13\')));d.N(\'5C\',2.c.k.5B);d.O(\'5E\',3(m){2.H({13:m});m=(m)?m.h:1U;U.1h();$(\'#7-6 .z\').r();l(!m){$(\'#7-6 .19 #13\').u(\'5Q 5J m\');$(\'#7-6 .z #1w\').u(\'38 y 1D V 4x m 1c 1q v?\');$(\'#7-6 .z D\').9(\'7-2l\',\'3x\')}Q l(m===2.c.h){$(\'#7-6 .z #1w\').u(\'33 3a 5T 1q m 1c f v.  2m 5G 1F 7 3e 6.\');$(\'#7-6 .19 #13\').u(m);$(\'#7-6 .z #1w\').L(\'1l\');$(\'#7-6 .z D\').1g()}Q{$(\'#7-6 .19 #13\').u(m);$(\'#7-6 .z #1w\').u(\'38 y 1D V 3p V 5H 5I 1q v 2f a 5K?\');$(\'#7-6 .z D\').u(\'5k 22 V 1z 1q 5d 1c \'+m);$(\'#7-6 .z D\').9(\'7-2l\',\'1z\')}});$(\'#7-6 D\').3u(\'Y\',3(){l($(f).9(\'7-2l\')===\'3x\'){j.i(\'4M\')d.N(\'4L\',2.c.k);U.1T(18 16($(\'#7-6 #1m\')));d.O(\'4K\',3(9){U.1h();j.i(9);$(\'#7-6 #1m\').o(\'5e, y 3a 4N 1q m 1c \'+9.B+\' 1F y 4O 4R 10 M 4Q 4P.  4I 4H\\\'t 1h 22.  2m 4B 1F 7 3e 4A\').L(\'1l\')})}Q{d.N(\'4z\',{v:2.c.k,m:2.c.13.4y});18 16($(\'#7-6 #1m\'));d.O(\'4C\',3(9){$(\'#7-6 #1m\').o(\'4D 4G\').L(\'1l\');2.H({1Q:2.c.k.B,1v:2.c.13.h});1i(3(){$(\'#36\').r()},4F)})}})}},1B:3(){$(\'.19, .z\').1g();$(\'#7-6 .4E\').r();$(\'#7-6 .z D\').r();$(\'#1m\').o(\'\')}},\'1a\':{1y:P,\'R\':[],2t:3(){4 $1k=$(\'#1a 1k\');$1k.3m();f.R.1d(3(A){$1k.2w(\'<3w><1f>\'+A.h+\'</1f><1f>\'+A.M+\'</1f></3w>\')});$(\'#1a 1k 1f:2N(\'+2.c.h+\')\').3v().4S(\'4T-57\',\'56\')},2W:3(9){f.R=9;f.2t()},2G:3(A){j.i(\'55 58\',A);4 2z=f.R.2E(3(9){n 9.h===A.h});l(2z.1Y){2z[0].M=A.M}Q{f.R.1T(A)}f.R.59(3(a,b){n b.M-a.M});f.2t()}}}});2.G()})();3 2K(2){4 $1I={};(3 5c(){X.1P(2.q).15(3(11){4 8=2.q[11];l(8.E){X.1P(8.E).1d(3(E){4 2q=8.E[E];2.q[11][\'$\'+E]=$(2q.17);$1I[2q.15]=2.q[11][\'$\'+E]})}n 8})})();2.H=3(1J){X.1P(1J).1d(3(1G){l($1I[1G]){$1I[1G].o(1J[1G])}});2.c=X.2s({},2.c,1J)};2.C=3(2C,9){4 1O=2C.1O(\'.\');4 8=1O[0];4 1R=1O[1];j.i(\'5b \'+8+\' \'+1R);4 2X=(8===\'Z\')?2.Z[1R]:2.q[8][1R]2X(9)};4 1t={};2.2p=3(8){1t[8]=P};2.I={2r:2Z,2x:{},T:3(8,30){l(f.2r)n;$(\'.8\').1g();l(2.q[8]&&2.q[8].G&&(!f.2x[8]||1t[8])){2.q[8].G(30);5a 1t[8]}$(\'#\'+8+\'.8\').r();4 1b=8.2v(\'-\',\' \');$(\'#1A a\').2O(\'2Q\');$(\'#1A a:2N(\'+1b+\')\').L("2Q");54.53({},1b,8);3 3k(2T){n 2T.2v(/\\w\\S*/g,3(2A){n 2A.4X(0).4W()+2A.4V(1).4U()})}$(31).4Y(\'4Z\',\'52 51 | \'+3k(1b));f.2x[8]=P}};$(31).x(\'Y\',\'a\',3(e){4 1r=$(f).50(\'1r\');2.I.T(1r);e.3f()});n 2}',62,366,'||app|function|var||cities|conquer|page|data|||state|socket||this||username|log|console|nearestCity|if|leader|return|html|your|pages|show|||text|city||on|you|step3|row|cityname|cue|button|dom|portal|init|set|navigate|response|modal|addClass|points|emit|once|true|else|top10||goTo|spinners|to|error|Object|click|global||pageName|fiveOthers|curLeader|cityObj|map|loadingSpinner|el|new|step2|leaderboard|unHef|of|forEach|isLoggedIn|td|hide|stop|setTimeout|join|tbody|green|attackResults|geolocation|nearbyCities|have|the|href|remove|pagesToForce|beingAttacked|attackingName|attackQ|onLoad|protected|attack|nav|reset|foundLocation|like|JSON|and|stateKey|location|watchState|stateUpdate|savedInfo|spinner|updateCurrentCities|id|split|keys|attackingCityName|fnName|red|push|null|byCities|callback|dethroned|length|home|br|attackResponse|here|for|locationString|accountInfo|locationModule|becomeLoggedIn|stringify|defaultPage|createUserFeedback|window|getCurrentCity|long|attackid|in|renderNavMenu|loading|lat|1000|getCurrentPosition|type|Go|position|img|forceReinit|domObj|hasErrored|assign|renderTop10|where|replace|append|pagesVisited|locObj|foundScore|txt|doneLoading|what|slice|filter|find|updateScore|Your|stepTwo|acc|johnsFramework|curCity|toggle|contains|removeClass|We|currentPage|errText|navigator|str|localStorage|accountinfo|setAndRender|fn|myPoints|false|value|document|li|You|class|attackFailed|attackModal|website|Would|attacked|are|being|concat|been|more|preventDefault|message|signup|err|capabilities|toTitleCase|coords|empty|pagesToRender|div|try|body|strange|That|renderSingle|one|parent|tr|usurp|code|that|denied|me|credentials|PERMISSION_DENIED|not|verifing|do|player|verifyUser|userResponse|Unable|savedinfo|longitude|latitude|parse|capability|getItem|citiesNearby|sendPosition|getPageFromUrl|updated|getfullleaderboard|is|by|attacker|pointsUpdate|THE|BLOCK|attackSuccess|iof|fadeOut|tookControl|4000|took|rowwww|control|src|top10scoreupdate|ATTACK|blockAttack|container|indexOf|substring|shift|must|citiesNearbyResults|it|Unfortunately|pathname|reduce|hostname|attackBlockSuccess|port|connect|dethronedCity|300|gif|io|looks|become|leaderid|attackCity|lands|out|attackConfirm|Attack|step1|600|confirmed|don|But|signUpCall|conquerResponse|conquerCity|conqieruing|now|will|hour|every|accumulate|css|background|toLowerCase|substr|toUpperCase|charAt|prop|title|attr|Leaders|City|pushState|history|update|yellow|color|score|sort|delete|cueing|registerWatchStateVars|leadership|Congrats|well|working|be|seems|found|Click|val|focus|nearby|Great|somewhere|or|disabled|but|Looks|Look|settings|unable|were|again|admincode|Cities|cityid|getCurrentLeader|ul|currentLeaderFeedback|country|off|take|over|current|coup|createUserSuccess|createUserError|newUser|Successfully|created|No|setItem|account|already'.split('|'),0,{}))
+
+  </script>
+</body>
+</html>

@@ -134,7 +134,7 @@
     text-align: center;
   }
 
-  .modal.beingAttacked, .modal#attackFailed {
+  .modal.beingAttacked, .modal#attackFailed, .modal#dethroned {
     background-color: rgba(200,10,10,0.9);
     border-top: 10px solid red;
   }
@@ -192,6 +192,7 @@
         <div id="attackQ"></div>
         <button>Click here to take control of the city</button>
         <div id="attackResults"></div>
+        <button class="reset">Click here to refresh this page and try again</button>
       </div>
     </div>
 
@@ -226,7 +227,7 @@
   </div>
 
   <div class="modal" id="dethroned">
-    <h2>You have been dethroned of <span id="dethronedCity"></span></h2>
+    <h2>You have been dethroned of <span id="dethronedCity"></span> by <span id="dethronedBy"></span></h2>
   </div>
 
   <!-- javascript includes -->
@@ -366,22 +367,26 @@
             });
           });
 
-          socket.on('dethroned', function(cityObj) {
-            console.log('you have been dethroned of ', cityObj);
+          socket.on('dethroned', function(data) {
+            console.log('you have been dethroned of ', data.cityName);
             app.cue('your-portal.updateCurrentCities', app.state.cities.filter(function(city) {
-              return city !== cityObj.cityname;
+              return city !== data.cityName;
             }));
             $('.beingAttacked').remove();
-            $('#dethronedCity').html(cityObj.cityname);
-            $('#dethroned').show();
-            setTimeout(function() {
-              $('#dethroned').show();
-            }, 1000);
+            app.cue('global.displayDethronedModal', data);
             app.cue('conquer-cities.reset');
             app.forceReinit('conquer-cities');
             app.navigate.goTo('your-portal');
           });
 
+        },
+        displayDethronedModal: function(data) {
+          $('#dethronedBy').html(data.thief);
+          $('#dethronedCity').html(data.cityName);
+          $('#dethroned').show();
+          setTimeout(function() {
+            $('#dethroned').hide();
+          }, 3500);
         }
       },
       init: function() {
@@ -423,6 +428,41 @@
               console.log(app.state);
               app.cue('global.becomeLoggedIn');
               onLoad();
+
+              // display each of the missedAttacks
+              if (response.missedAttacks && response.missedAttacks.length) {
+                (function displayDethronedModal(i) {
+                  app.cue('global.displayDethronedModal', response.missedAttacks[i]);
+                  if (i === response.missedAttacks.length - 1) {
+                    return;
+                  }
+                  setTimeout(function() {
+                    displayDethronedModal(++i);
+                  }, 4200);
+                })(0);
+              }
+              if (response.activeOutgoingAttacks && response.activeOutgoingAttacks.length) {
+                (function displayAttackingModal(i) {
+
+                  app.set({
+                    attackingCityName: response.activeOutgoingAttacks[i].cityname,
+                    attackingName: response.activeOutgoingAttacks[i].attacking
+                  });
+
+                  $('#attackModal').show();
+
+                  setTimeout(function() {
+                    $('#attackModal').hide();
+                  }, 3500);
+
+                  if (i === response.missedAttacks.length - 1) {
+                    return;
+                  }
+                  setTimeout(function() {
+                    displayAttackingModal(++i);
+                  }, 4200);
+                })(0);
+              }
             } else {
               onLoad();
               app.navigate.goTo('error', 'Unable to log you in.  That\'s strange');
@@ -565,7 +605,7 @@
               if (nearestCity) {
                 $('#curCity').text(nearestCity.cityname);
                 $('#nearbyCities').text(fiveOthers.join(', '));
-                setTimeout(stepTwo, 1000);
+                setTimeout(stepTwo, 800);
               }
             });
 
@@ -590,6 +630,7 @@
                   $('#conquer-cities .step2 #curLeader').text(leader);
                   $('#conquer-cities .step3 #attackQ').addClass('green');
                   $('#conquer-cities .step3 button').hide();
+                  $('#conquer-cities button.reset').show();
                 } else {
                   $('#conquer-cities .step2 #curLeader').text(leader);
                   $('#conquer-cities .step3 #attackQ').text('Would you like to try to take over the city in a coup?');
@@ -608,7 +649,9 @@
                   socket.once('conquerResponse', function(data) {
                     spinners.stop();
                     console.log(data);
-                    $('#conquer-cities #attackResults').html('Congrats, you are now the leader of ' + data.cityname + ' and you will accumulate 10 points every hour.  But don\'t stop here.  Go out and conquer more lands').addClass('green');
+                    $('#conquer-cities #attackResults').html('<h1>Congrats</h1>You are now the leader of ' + data.cityname + ' and you will accumulate 10 points every hour.  But don\'t stop here.  Go out and conquer more lands').addClass('green');
+                    app.cue('your-portal.updateCurrentCities', app.state.cities.concat([data.cityname]));
+                    $('#conquer-cities button.reset').show();
                   });
                 } else {
 
@@ -639,7 +682,13 @@
 
               });
 
-            }
+            };
+
+            $('#conquer-cities').on('click', 'button.reset', function() {
+              app.cue('conquer-cities.reset');
+              app.forceReinit('conquer-cities');
+              app.navigate.goTo('your-portal');
+            });
 
           },
 
@@ -648,6 +697,7 @@
             $('#conquer-cities .step1').show();
             $('#conquer-cities .step3 button').show();
             $('#attackResults').html('');
+            $('#conquer-cities button.reset').hide();
           }
 
         },

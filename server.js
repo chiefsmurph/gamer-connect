@@ -389,17 +389,19 @@ io.sockets.on('connection', function (socket) {
     console.log('verifying ' + JSON.stringify(data) );
     dbFunctions.verifyUser(data.playerid, data.hashcode, function(response) {
       if (!response) { return socket.emit('userResponse', false); }
+      console.log('about to login ' + data.playerid);
       dbFunctions.getAllLandClaimsForPlayer(data.playerid, function(cities) {
         console.log('all land claims', cities);
-        pointsManager.loginUser(data.playerid, socket);
+        console.log('about to login ' + data.playerid);
+        var activeEvents = pointsManager.loginUser(data.playerid, socket);
         user = Object.assign({}, response, {
           loggedIn: true
         });
         console.log(JSON.stringify(response) + 'res');
-        socket.emit('userResponse', {
+        socket.emit('userResponse', Object.assign({}, {
           points: response.points,
           cities: cities
-        });
+        }, activeEvents));
       });
     });
   });
@@ -456,6 +458,7 @@ io.sockets.on('connection', function (socket) {
       }
       var attackid = pointsManager.newAttack(user.playerid, user.username, attackingid, data.city);
       socket.emit('attackConfirm', attackid);
+      console.log('')
       pointsManager.sendTo(attackingid, 'beingAttacked', {
         city: data.city,
         attackid: attackid,
@@ -515,12 +518,13 @@ var pointsManager = (function() {
     })(),
     addScoreIncrease: function(claimid, cityid, playerid) {
       //console.log(claimid, cityid, playerid);
+      playerDb[playerid].timeouts = playerDb[playerid].timeouts || [];
       playerDb[playerid].timeouts.push({
         claimid: claimid,
         cityid: cityid,
         timeout: new setInterval(function() {
 
-          console.log('incrementing points for ' + playerid);
+          //console.log('incrementing points for ' + playerid);
           // increment city_people.points
           dbFunctions.incrementPlayer(playerid, function(data) {
             if (!data) { return console.log('uh oh error updating player'); }
@@ -546,7 +550,6 @@ var pointsManager = (function() {
         if (!players) return;
         players.forEach(function(player) {
           playerDb[player.playerid] = {};
-          playerDb[player.playerid].timeouts = [];
           playerDb[player.playerid].points = player.points;
           playerDb[player.playerid].username = player.username;
 
@@ -571,8 +574,7 @@ var pointsManager = (function() {
       playerDb[playerid] = {
         username: username,
         socket: socket,
-        points: 0,
-        timeouts: []
+        points: 0
       };
       this.leaderboard.add({
         playerid: playerid,
@@ -584,7 +586,20 @@ var pointsManager = (function() {
       if (!playerDb[playerid]) {
         return console.log('we have a problem.  user ' + playerid + ' tried to login but we have no account of them');
       }
+
+      console.log('logged in ' + playerid + 'socket', socket);
       playerDb[playerid].socket = socket;
+      return {
+        missedAttacks: playerDb[playerid].missedAttacks,
+        activeAttacksOutgoing: Object.keys(activeAttacks).filter(function(attackid) {
+          return activeAttacks[attackid].attacker === playerid;
+        }).map(function(attackid) {
+          return {
+            attacking: playerDb[activeAttacks[attackid].attacking].username,
+            cityname: activeAttacks[attackid].cityObj.cityname
+          };
+        })
+      };
     },
     registerNewLeader(claimid, cityid, playerid) {
       console.log('registering new leader ', cityid, playerid);
@@ -618,7 +633,22 @@ var pointsManager = (function() {
               if (!response) { return console.log('error making land claim inactive '); }
               pointsManager.addScoreIncrease(response.claimid, cityObj.cityid, playerid);
               pointsManager.sendTo(playerid, 'tookControl', cityObj);
-              pointsManager.sendTo(attackingid, 'dethroned', cityObj);
+              var receivedNotice = pointsManager.sendTo(attackingid, 'dethroned', {
+                thief: playerusername,
+                cityName: cityObj.cityname
+              });
+              if (!receivedNotice) {
+                console.log('no did not receive notice')
+                playerDb[attackingid].missedAttacks = playerDb[attackingid].missedAttacks || [];
+                playerDb[attackingid].missedAttacks.push({
+                  thief: playerusername,
+                  cityName: cityObj.cityname
+                });
+              } else {
+                console.log('yes received notice');
+              }
+              activeAttacks[attackid] = null;
+              delete activeAttacks[attackid];
             });
 
           });
@@ -637,10 +667,13 @@ var pointsManager = (function() {
       pointsManager.sendTo(activeAttacks[attackid].attacking, 'attackBlockSuccess');
     },
     sendTo: function(playerid, evt, obj) {
+      console.log('sending ' + evt + ' and ' + JSON.stringify(obj) + ' to ' + playerid);
       if (playerDb[playerid].socket) {
-        console.log('sent ' + evt);
         playerDb[playerid].socket.emit(evt, obj);
+        return true;
       }
+      console.log('couldnt get through')
+      return false;
     }
   };
 })();
