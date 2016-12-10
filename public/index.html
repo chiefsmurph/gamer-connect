@@ -652,6 +652,12 @@
                     }
                     $('#conquer-cities #attackResults').html('Congrats!  You are now the leader of ' + data.cityname + ' and you will accumulate 10 points every hour.  But don\'t stop here.  Go out and conquer more lands').addClass('green');
                     app.cue('your-portal.updateCurrentCities', app.state.cities.concat([data.cityname]));
+                    setTimeout(function() {
+                      if (app.navigate.curPage === 'conquer-cities') {
+                        app.navigate.goTo('your-portal');
+                      }
+                      app.forceReinit('conquer-cities');
+                    }, 2000);
                   });
                 } else {
 
@@ -793,6 +799,7 @@
     };
 
     app.navigate = {
+      curPage: null,
       hasErrored: false,
       pagesVisited: {},
       goTo: function(page, value) {
@@ -823,6 +830,7 @@
 
         $(document).prop('title','City Leaders | ' + toTitleCase(unHef));
         this.pagesVisited[page] = true;
+        this.curPage = page;
       }
     };
 
