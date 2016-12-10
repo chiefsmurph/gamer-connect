@@ -456,11 +456,12 @@ io.sockets.on('connection', function (socket) {
       if (response.leaderid !== attackingid) {
         return console.log('HACKER', JSON.stringify(response), attackingid);
       }
-      var attackid = pointsManager.newAttack(user.playerid, user.username, attackingid, data.city);
+      console.log('user obj ' + JSON.stringify(user), attackingid, cityObj);
+      var attackid = pointsManager.newAttack(user.playerid, user.username, attackingid, cityObj);
       socket.emit('attackConfirm', attackid);
       console.log('')
       pointsManager.sendTo(attackingid, 'beingAttacked', {
-        city: data.city,
+        city: cityObj,
         attackid: attackid,
         attacker: user.username
       });
