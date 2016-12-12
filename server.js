@@ -840,13 +840,13 @@ var pointsManager = (function() {
           var top10 = this.getTop10();
           //console.log('top10 gotten', top10[top10.length - 1].points, newscore);
 
-          if (!(newscore >= top10[top10.length - 1].points)) { return console.log('not in top 10'); }
+          if (top10.length && !(newscore >= top10[top10.length - 1].points)) { return console.log('not in top 10'); }
           if (dataUpdate.points) {
             var toPass = {
               username: playerDb[playerid].username,
               points: dataUpdate.points
             };
-            if (newscore < beforeTop10[beforeTop10.length - 1].points) {
+            if (!beforeTop10.length || newscore < beforeTop10[beforeTop10.length - 1].points) {
               // include cities if just breaking into top 10
               toPass.cities = playerDb[playerid].cities;
             }
