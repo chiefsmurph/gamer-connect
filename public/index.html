@@ -459,7 +459,7 @@
               app.navigate.goTo('error', 'Unable to log you in.  That\'s strange');
               localStorage.removeItem('accountinfo');
               setTimeout(function() {
-                app.cue('global.init');
+                window.location.reload(false); 
               }, 1000);
             }
             app.set(Object.assign({}, savedInfo, response));
