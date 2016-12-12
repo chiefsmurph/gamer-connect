@@ -834,7 +834,7 @@ var pointsManager = (function() {
           if (index === -1) return console.log('tried updating for playerid that was not found in leaderboard');
 
           var beforeTop10 = this.getTop10();
-          data[indexOf] = Object.assign({}, data[indexOf], dataUpdate);
+          data[index] = Object.assign({}, data[index], dataUpdate);
           //console.log('updated ');
           //console.log(data);
 
