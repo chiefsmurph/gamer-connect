@@ -831,7 +831,10 @@ var pointsManager = (function() {
             }
             return -1;
           })();
-          if (index === -1) return console.log('tried updating for playerid that was not found in leaderboard');
+          if (index === -1) {
+            console.log(data, JSON.stringify(data));
+            return console.log('tried updating for playerid that was not found in leaderboard');
+          }
 
           var beforeTop10 = this.getTop10();
           data[index] = Object.assign({}, data[index], dataUpdate);
@@ -840,7 +843,7 @@ var pointsManager = (function() {
 
           var top10 = this.getTop10();
           //console.log('top10 gotten', top10[top10.length - 1].points, newscore);
-
+          var newscore = data[index].points;
           if (top10.length && !(newscore >= top10[top10.length - 1].points)) { return console.log('not in top 10'); }
           if (dataUpdate.points) {
             var toPass = {
@@ -920,7 +923,7 @@ var pointsManager = (function() {
           Object.keys(playerDb).forEach(function(id) {
             var player = playerDb[id];
             pointsManager.leaderboard.add({
-              playerid: player.playerid,
+              playerid: Number(id),
               username: player.username,
               points: player.points,
               cities: player.cities
