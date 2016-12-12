@@ -457,7 +457,7 @@
             if (!response) {
               onLoad();
               app.navigate.goTo('error', 'Unable to log you in.  That\'s strange');
-              localStorage.removeItem();
+              localStorage.removeItem('accountinfo');
               setTimeout(function() {
                 app.cue('global.init');
               }, 1000);
