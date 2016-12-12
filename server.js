@@ -684,6 +684,12 @@ io.sockets.on('connection', function (socket) {
     var checkForBadWords = function(name) {
       var includesBad = false;
       var badWords = ['fuck', 'cock', 'pus', 'dick', 'bastard', 'cunt', 'ass', 'nig', 'bitch'];
+      var numToLetters = {
+        1: 'i',
+        0: 'o',
+        5: 's',
+        8: 'b'
+      };
       for (var i = 0; i < badWords.length; i++) {
         if (data.username.toLowerCase().indexOf(badWords[i]) !== -1) {
           includesBad = true;

@@ -459,7 +459,7 @@
               app.navigate.goTo('error', 'Unable to log you in.  That\'s strange');
               localStorage.removeItem('accountinfo');
               setTimeout(function() {
-                window.location.reload(false); 
+                window.location.reload(false);
               }, 1000);
             }
             app.set(Object.assign({}, savedInfo, response));
@@ -779,7 +779,8 @@
             var top10 = this.top10;
             var index = (function getRelatedIndex() {
               for (var i = 0; i < top10.length; i++) {
-                if (top10.username === row.username) {
+                // debugger;
+                if (top10[i].username === row.username) {
                   return i;
                 }
               }
@@ -789,7 +790,7 @@
               this.top10.push(row);
               return console.error('tried updating username that doesnt exist');
             }
-            this.top10[index] = Object.assign({}, this.top[index], row);
+            this.top10[index] = Object.assign({}, this.top10[index], row);
             this.top10.sort(function(a, b) {
               return b.points - a.points;
             });
