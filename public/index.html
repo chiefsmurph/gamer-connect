@@ -212,7 +212,7 @@
       </div>
       <div class="step3">
         <div id="attackQ"></div>
-        <button>Click here to take control of the city</button>
+        <button id="goForIt">Click here to take control of the city</button>
         <div id="attackResults"></div>
         <button class="reset">Click here to refresh this page and try again</button>
       </div>
@@ -661,22 +661,22 @@
                 if (!leader) {
                   $('#conquer-cities .step2 #curLeader').text('No current leader');
                   $('#conquer-cities .step3 #attackQ').text('Would you like to become leader of the city?');
-                  $('#conquer-cities .step3 button').data('conquer-type', 'usurp');
+                  $('#conquer-cities .step3 button#goForIt').data('conquer-type', 'usurp');
                 } else if (leader === app.state.username) {
                   $('#conquer-cities .step3 #attackQ').text('You are already the leader of this city.  Go off and conquer more cities.');
                   $('#conquer-cities .step2 #curLeader').text(leader);
                   $('#conquer-cities .step3 #attackQ').addClass('green');
-                  $('#conquer-cities .step3 button').hide();
+                  $('#conquer-cities .step3 button#goForIt').hide();
                   $('#conquer-cities button.reset').show();
                 } else {
                   $('#conquer-cities .step2 #curLeader').text(leader);
                   $('#conquer-cities .step3 #attackQ').text('Would you like to try to take over the city in a coup?');
-                  $('#conquer-cities .step3 button').text('Click here to attack the leadership of ' + leader);
-                  $('#conquer-cities .step3 button').data('conquer-type', 'attack');
+                  $('#conquer-cities .step3 button#goForIt').text('Click here to attack the leadership of ' + leader);
+                  $('#conquer-cities .step3 button#goForIt').data('conquer-type', 'attack');
                 }
               });
 
-              $('#conquer-cities .step3 button').one('click', function() {
+              $('#conquer-cities .step3 button#goForIt').one('click', function() {
                 if ($(this).data('conquer-type') === 'usurp') {
                   console.log('conqieruing')
                   socket.emit('conquerCity', app.state.nearestCity);
@@ -686,7 +686,7 @@
                   socket.once('conquerResponse', function(data) {
                     spinners.stop();
                     console.log(data);
-                    $('#conquer-cities .step3 button').hide();
+                    $('#conquer-cities .step3 button#goForIt').hide();
                     $('#conquer-cities button.reset').show();
                     if (!data) {
                       return $('#conquer-cities #attackResults').html('Uh oh looks like someone else already snagged this city.').addClass('red');
@@ -742,7 +742,7 @@
           reset: function() {
             $('.step2, .step3').hide();
             $('#conquer-cities .step1').show();
-            $('#conquer-cities .step3 button').show();
+            $('#conquer-cities .step3 button#goForIt').show();
             $('#attackResults').html('');
             $('#conquer-cities button.reset').hide();
           }
