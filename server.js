@@ -980,6 +980,7 @@ var pointsManager = (function() {
       playerDb[playerid].socket = socket;
       return {
         missedAttacks: playerDb[playerid].missedAttacks,
+        activeAttacksIncoming: 
         activeAttacksOutgoing: Object.keys(activeAttacks).filter(function(attackid) {
           return activeAttacks[attackid].attacker === playerid;
         }).map(function(attackid) {
