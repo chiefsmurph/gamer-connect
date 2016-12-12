@@ -680,11 +680,26 @@ io.sockets.on('connection', function (socket) {
   // user stuff
 
   socket.on('newUser', function(data) {
+
+    var checkForBadWords = function(name) {
+      var includesBad = false;
+      var badWords = ['fuck', 'cock', 'pus', 'dick', 'bastard', 'cunt', 'ass', 'nig', 'bitch'];
+      for (var i = 0; i < badWords.length; i++) {
+        if (data.username.toLowerCase().indexOf(badWords[i]) !== -1) {
+          includesBad = true;
+        }
+      }
+      return includesBad;
+    };
+
     console.log(JSON.stringify(data), 'newuserdata');
     console.log(JSON.stringify(user));
     if (data.lat === user.lat && data.long === user.long) {
       if (!(data.username.length > 3 && data.username.length < 14)) {
         return socket.emit('createUserError', 'Username must be between 3 & 14 characters in length');
+      }
+      if (checkForBadWords(data.username)) {
+        return socket.emit('createUserError', 'Don\'t be a dumbass.  No swearing allowed in your username');
       }
       CityPeople.checkUsernameAvailable(data.username, function(available) {
         console.log('av', available);
