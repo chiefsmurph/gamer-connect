@@ -822,9 +822,10 @@ var pointsManager = (function() {
           data.push(playerObj);
         },
         update: function(playerid, dataUpdate) {
+          console.log(playerid, JSON.stringify(dataUpdate));
           var index = (function getRelatedIndex() {
             for (var i = 0; i < data.length; i++) {
-              if (data.playerid === playerid) {
+              if (data[i].playerid === playerid) {
                 return i;
               }
             }
@@ -936,11 +937,13 @@ var pointsManager = (function() {
       playerDb[playerid] = {
         username: username,
         socket: socket,
+        cities: [],
         points: 0
       };
       this.leaderboard.add({
         playerid: playerid,
         username: username,
+        cities: [],
         points: 0
       });
     },
