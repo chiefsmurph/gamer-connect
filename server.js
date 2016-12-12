@@ -1030,7 +1030,7 @@ var pointsManager = (function() {
               playerDb[playerid].cities.push(cityObj.cityname);
               // update leaderboard which handles emitting if either user in top 10
               [attackingid, playerid].forEach(function(id) {
-                leaderboard.update(id, {
+                pointsManager.leaderboard.update(id, {
                   cities: playerDb[id].cities
                 });
               });
