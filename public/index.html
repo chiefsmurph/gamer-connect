@@ -454,46 +454,49 @@
           socket.once('userResponse', function(response) {
             console.log('savedinfo: ' + JSON.stringify(savedInfo));
             console.log('response: ' + JSON.stringify(response));
-            if (response) {
-              app.set(Object.assign({}, savedInfo, response));
-              app.cue('your-portal.updateCurrentCities', response.cities);
-              console.log(app.state);
-              app.cue('global.becomeLoggedIn');
-              onLoad();
-
-              // display each of the missedAttacks
-              if (response.missedAttacks && response.missedAttacks.length) {
-                (function displayDethronedModal(i) {
-                  app.cue('global.displayDethronedModal', response.missedAttacks[i]);
-                  if (i === response.missedAttacks.length - 1) {
-                    return;
-                  }
-                  setTimeout(function() {
-                    displayDethronedModal(++i);
-                  }, 4200);
-                })(0);
-              }
-              if (response.activeAttacksOutgoing && response.activeAttacksOutgoing.length) {
-                (function displayAttackingModal(i) {
-
-                  app.set({
-                    attackingCityName: response.activeAttacksOutgoing[i].cityname,
-                    attackingName: response.activeAttacksOutgoing[i].attacking
-                  });
-
-                  $('#attackModal').show();
-
-                  if (i === response.missedAttacks.length - 1) {
-                    return;
-                  }
-                  setTimeout(function() {
-                    displayAttackingModal(++i);
-                  }, 4200);
-                })(0);
-              }
-            } else {
+            if (!response) {
               onLoad();
               app.navigate.goTo('error', 'Unable to log you in.  That\'s strange');
+              localStorage.removeItem();
+              setTimeout(function() {
+                app.cue('global.init');
+              }, 1000);
+            }
+            app.set(Object.assign({}, savedInfo, response));
+            app.cue('your-portal.updateCurrentCities', response.cities);
+            console.log(app.state);
+            app.cue('global.becomeLoggedIn');
+            onLoad();
+
+            // display each of the missedAttacks
+            if (response.missedAttacks && response.missedAttacks.length) {
+              (function displayDethronedModal(i) {
+                app.cue('global.displayDethronedModal', response.missedAttacks[i]);
+                if (i === response.missedAttacks.length - 1) {
+                  return;
+                }
+                setTimeout(function() {
+                  displayDethronedModal(++i);
+                }, 4200);
+              })(0);
+            }
+            if (response.activeAttacksOutgoing && response.activeAttacksOutgoing.length) {
+              (function displayAttackingModal(i) {
+
+                app.set({
+                  attackingCityName: response.activeAttacksOutgoing[i].cityname,
+                  attackingName: response.activeAttacksOutgoing[i].attacking
+                });
+
+                $('#attackModal').show();
+
+                if (i === response.missedAttacks.length - 1) {
+                  return;
+                }
+                setTimeout(function() {
+                  displayAttackingModal(++i);
+                }, 4200);
+              })(0);
             }
           });
 
