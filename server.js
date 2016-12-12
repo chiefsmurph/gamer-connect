@@ -811,11 +811,7 @@ io.sockets.on('connection', function (socket) {
       var attackid = pointsManager.newAttack(user.playerid, user.username, attackingid, cityObj);
       socket.emit('attackConfirm', attackid);
       console.log('')
-      pointsManager.sendTo(attackingid, 'beingAttacked', {
-        city: cityObj,
-        attackid: attackid,
-        attacker: user.username
-      });
+
     });
   });
 
@@ -980,7 +976,15 @@ var pointsManager = (function() {
       playerDb[playerid].socket = socket;
       return {
         missedAttacks: playerDb[playerid].missedAttacks,
-        activeAttacksIncoming: 
+        activeAttacksIncoming: Object.keys(activeAttacks).filter(function(attackid) {
+          return activeAttacks[attackid].attacking === playerid;
+        }).map(function(attackid) {
+          return {
+            city: activeAttacks[attackid].cityObj,
+            attackid: attackid,
+            attacker: activeAttacks[attackid].attacker
+          };
+        }),
         activeAttacksOutgoing: Object.keys(activeAttacks).filter(function(attackid) {
           return activeAttacks[attackid].attacker === playerid;
         }).map(function(attackid) {
@@ -1056,8 +1060,17 @@ var pointsManager = (function() {
         }, 60000)
       };
 
-      return attackid;
       console.log('set up new attack', attackid);
+
+      pointsManager.sendTo(attackingid, 'beingAttacked', {
+        city: cityObj,
+        attackid: attackid,
+        attacker: playerusername
+      });
+
+      return attackid;
+
+
     },
     attackBlock: function(attackid) {
       if (!activeAttacks[attackid]) {

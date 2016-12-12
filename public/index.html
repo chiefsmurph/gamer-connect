@@ -381,11 +381,7 @@
 
           // receiving attacks
           socket.on('beingAttacked', function(data) {
-            console.log('being attacked', data);
-
-            var $modal = $('<div class="modal beingAttacked">Your city of <b>' + data.city.cityname + '</b> is being attacked by ' + data.attacker + '<br><br><button>click here to BLOCK THE ATTACK</button></div>');
-            $modal.data('attack-id', data.attackid).show();
-            $('body').append($modal);
+            app.cue('global.beingAttacked', data);
           });
 
           $('body').on('click', '.modal.beingAttacked button', function() {
@@ -419,6 +415,13 @@
           setTimeout(function() {
             $('#dethroned').hide();
           }, 3500);
+        },
+        beingAttacked: function(data) {
+          console.log('being attacked', data);
+
+          var $modal = $('<div class="modal beingAttacked">Your city of <b>' + data.city.cityname + '</b> is being attacked by ' + data.attacker + '<br><br><button>click here to BLOCK THE ATTACK</button></div>');
+          $modal.data('attack-id', data.attackid).show();
+          $('body').append($modal);
         }
       },
       init: function() {
@@ -498,6 +501,9 @@
                 }, 4200);
               })(0);
             }
+            response.activeAttacksIncoming.forEach(function(attack) {
+              app.cue('global.beingAttacked', attack);
+            });
           });
 
         } else {
@@ -810,7 +816,7 @@
               var cities = app.pages.leaderboard.getCitiesForUsername(username);
               app.set({
                 tooltipname: username,
-                tooltipbody: cities.join('<br>')
+                tooltipbody: (cities.length) ? cities.join('<br>') : 'No cities'
               });
               $ttBox.show();
             };
