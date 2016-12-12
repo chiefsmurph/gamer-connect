@@ -288,6 +288,7 @@
     var app = johnsFramework({
       state: {
         isLoggedIn: false,
+        points: 0,
         cities: []
       },
       global: {
@@ -785,6 +786,8 @@
       });
       app.state = Object.assign({}, app.state, stateUpdate);
     };
+
+    app.set(app.state);
 
     app.cue = function(what, data) {
       var split = what.split('.');

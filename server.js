@@ -29,6 +29,8 @@ app.get('*', function(req, res){
 
 
 
+
+
 //
 //
 // pg.connect(process.env.DATABASE_URL + '?ssl=true', function(err, client) {
@@ -65,192 +67,514 @@ io.sockets.on('connection', function (socket) {
 
 // var cities = require('cities');
 
-var dbFunctions = {
-  executeQuery: function(q, callback) {
-    pg.connect(process.env.DATABASE_URL + '?ssl=true', function(err, client, done) {
-      //CREATE TABLE pointss (dbId serial primary key, username VARCHAR(30) not null, points INT, handshake VARCHAR(60))
-      var query = client.query(q, function(err, result) {
-        done();
-        if (err) {
-          console.log(err);
-          return callback(null);
-        }
-        //console.log('executed query ' + q);
-        return callback((result && result.rows) ? result.rows : null);
-      });
-    });
-  },
-  addNewCity: function(cityName, lat, long, cb) {
-
-    console.log('creating new city ' + cityName);
-    // insert
-    pg.connect(process.env.DATABASE_URL + '?ssl=true', function(err, client, done) {
-      var queryText = 'INSERT INTO cities_distance (cityName, lat, long) VALUES($1, $2, $3)';
-      client.query(queryText, [cityName, lat, long], function(err, result) {
-
-        done();
-        if (err) console.log(err);
-        console.log('successfully created new city ' + cityName);
-        cb();
-
-      });
-    });
-
-  },
-  getAllCities: function(callback) {
-    pg.connect(process.env.DATABASE_URL + '?ssl=true', function(err, client, done) {
-      client.query('SELECT * FROM cities_distance', function(err, result) {
-
-        done();
-        if (err) console.log(err);
-
-        callback(result.rows);
-
-      });
-    });
-  },
-  getCitiesNearby: function(lat, long, callback) {
 
 
-    var addDistance = function(cities) {
-      return cities.map(function(city) {
-        city.distance = Math.sqrt(Math.pow(city.lat - lat, 2) + Math.pow(city.long - long, 2));
-        return city;
-      }).sort(function(a, b) {
-        return a.distance - b.distance;
-      });
-    };
-    console.log('getting cities near ' + lat + ', ' + long);
-    pg.connect(process.env.DATABASE_URL + '?ssl=true' , function(err, client, done) {
-      //client.query('SELECT * FROM cities_distance WHERE power(lat - ' + lat + ', 2) + power(long - ' + long +', 2) < 1000', function(err, result) {
-      client.query('SELECT * FROM cities_distance WHERE earth_box(ll_to_earth(' + lat + ', ' + long + '), 50000) @> ll_to_earth(lat, long)', function(err, result) {
-        done();
-        if (err) console.log(err);
-        var returnResult = addDistance(result.rows);
-        console.log('found near ' + returnResult[0].cityname);
-        callback(returnResult);
+// var dbFunctions = {
+//   executeQuery: function(q, callback) {
+//     pg.connect(process.env.DATABASE_URL + '?ssl=true', function(err, client, done) {
+//       //CREATE TABLE pointss (dbId serial primary key, username VARCHAR(30) not null, points INT, handshake VARCHAR(60))
+//       var query = client.query(q, function(err, result) {
+//         done();
+//         if (err) {
+//           console.log(err);
+//           return callback(null);
+//         }
+//         //console.log('executed query ' + q);
+//         return callback((result && result.rows) ? result.rows : null);
+//       });
+//     });
+//   },
+//   addNewCity: function(cityName, lat, long, cb) {
+//
+//     console.log('creating new city ' + cityName);
+//     // insert
+//     pg.connect(process.env.DATABASE_URL + '?ssl=true', function(err, client, done) {
+//       var queryText = 'INSERT INTO cities_distance (cityName, lat, long) VALUES($1, $2, $3)';
+//       client.query(queryText, [cityName, lat, long], function(err, result) {
+//
+//         done();
+//         if (err) console.log(err);
+//         console.log('successfully created new city ' + cityName);
+//         cb();
+//
+//       });
+//     });
+//
+//   },
+//   getAllCities: function(callback) {
+//     pg.connect(process.env.DATABASE_URL + '?ssl=true', function(err, client, done) {
+//       client.query('SELECT * FROM cities_distance', function(err, result) {
+//
+//         done();
+//         if (err) console.log(err);
+//
+//         callback(result.rows);
+//
+//       });
+//     });
+//   },
+//   getCitiesNearby: function(lat, long, callback) {
+//     var addDistance = function(cities) {
+//       return cities.map(function(city) {
+//         city.distance = Math.sqrt(Math.pow(city.lat - lat, 2) + Math.pow(city.long - long, 2));
+//         return city;
+//       }).sort(function(a, b) {
+//         return a.distance - b.distance;
+//       });
+//     };
+//     console.log('getting cities near ' + lat + ', ' + long);
+//     pg.connect(process.env.DATABASE_URL + '?ssl=true' , function(err, client, done) {
+//       //client.query('SELECT * FROM cities_distance WHERE power(lat - ' + lat + ', 2) + power(long - ' + long +', 2) < 1000', function(err, result) {
+//       client.query('SELECT * FROM cities_distance WHERE earth_box(ll_to_earth(' + lat + ', ' + long + '), 50000) @> ll_to_earth(lat, long)', function(err, result) {
+//         done();
+//         if (err) console.log(err);
+//         var returnResult = addDistance(result.rows);
+//         console.log('found near ' + returnResult[0].cityname);
+//         callback(returnResult);
+//
+//       });
+//     });
+//   },
+//   checkUsernameAvailable: function(username, callback) {
+//     this.executeQuery('SELECT * FROM city_people WHERE username = \'' + username + '\'', function(response) {
+//       console.log('response', response);
+//       callback(!response.length);
+//     });
+//   },
+//   createNewUser: function(username, lat, long, nearestCity, callback) {
+//
+//     var handshake = uuid.v1();
+//
+//     pg.connect(process.env.DATABASE_URL + "?ssl=true", function(err, client, done) {
+//       var queryText = 'INSERT INTO city_people (username, hashcode, lat, long, nearestCity) VALUES($1, $2, $3, $4, $5) RETURNING *';
+//       client.query(queryText, [username, handshake, lat, long, nearestCity], function(err, result) {
+//
+//         if (err)  console.error(err);
+//
+//         done();
+//         console.log('created new user ' + JSON.stringify(result.rows[0], null, 2));
+//         callback((result && result.rows && result.rows[0]) ? result.rows[0] : null);
+//
+//       });
+//     });
+//
+//   },
+//   verifyUser: function(playerid, hashcode, callback) {
+//     pg.connect(process.env.DATABASE_URL + '?ssl=true' , function(err, client, done) {
+//       //client.query('SELECT * FROM cities_distance WHERE power(lat - ' + lat + ', 2) + power(long - ' + long +', 2) < 1000', function(err, result) {
+//       client.query('SELECT * FROM city_people WHERE playerid = ' + playerid + ' AND hashcode = \'' + hashcode + '\'', function(err, result) {
+//         done();
+//         if (err) console.log(err);
+//         callback((result && result.rows && result.rows[0]) ? result.rows[0] : false);
+//
+//       });
+//     });
+//   },
+//   getCurrentLeader: function(cityid, callback) {
+//     pg.connect(process.env.DATABASE_URL + '?ssl=true' , function(err, client, done) {
+//       //client.query('SELECT * FROM cities_distance WHERE power(lat - ' + lat + ', 2) + power(long - ' + long +', 2) < 1000', function(err, result) {
+//       client.query('SELECT * FROM land_claims WHERE cityid = ' +cityid + ' AND isActive = true ORDER BY claimDate DESC LIMIT 1', function(err, result) {
+//         done();
+//         if (err) console.log(err);
+//         callback((result && result.rows && result.rows[0]) ? {
+//           leaderid: result.rows[0].leaderid,
+//           username: result.rows[0].leadername
+//         } : null);
+//
+//       });
+//     });
+//   },
+//   getAllPlayers: function(callback) {
+//     pg.connect(process.env.DATABASE_URL + '?ssl=true' , function(err, client, done) {
+//       //client.query('SELECT * FROM cities_distance WHERE power(lat - ' + lat + ', 2) + power(long - ' + long +', 2) < 1000', function(err, result) {
+//       client.query('SELECT * FROM city_people', function(err, result) {
+//         done();
+//         if (err) console.log(err);
+//         if (!(result && result.rows && result.rows.length)) {
+//           return callback(null);
+//         }
+//         callback(result.rows.map(function(row) {
+//           return {
+//             playerid: row.playerid,
+//             points: row.points,
+//             username: row.username
+//           };
+//         }));
+//       });
+//     });
+//   },
+//   incrementPlayer: function(playerid, callback) {
+//     this.executeQuery('UPDATE city_people SET points = points + 10 WHERE playerid = ' + playerid + ' RETURNING *', function(result) {
+//       //console.log(result);
+//       callback(result[0]);
+//     });
+//   },
+//   incrementLandClaim: function(claimid, callback) {
+//     this.executeQuery('UPDATE land_claims SET points = points + 10 WHERE claimid = ' + claimid + ' RETURNING *', function(result) {
+//       //console.log(result);
+//       callback(result[0]);
+//     });
+//   },
+//   claimLand: function(cityid, cityname, username, userid, callback) {
+//     //console.log(cityid, cityname, username, userid, lat, long);
+//     pg.connect(process.env.DATABASE_URL + "?ssl=true", function(err, client, done) {
+//       var queryText = 'INSERT INTO land_claims (cityid, cityname, leadername, leaderid) VALUES($1, $2, $3, $4) RETURNING *';
+//       client.query(queryText, [cityid, cityname, username, userid], function(err, result) {
+//
+//         if (err)  console.error(err);
+//
+//         done();
+//         console.log('created new land claim ' + JSON.stringify(result.rows[0], null, 2));
+//         callback((result && result.rows && result.rows[0]) ? result.rows[0] : null);
+//
+//       });
+//     });
+//   },
+//   getAllLandClaims: function(callback) {
+//     this.executeQuery('SELECT * FROM land_claims WHERE isActive = true', callback);
+//   },
+//   getAllLandClaimsForPlayer: function(playerid, callback) {
+//     this.executeQuery('SELECT * FROM land_claims WHERE leaderid = \'' + playerid + '\' AND isActive = true', function(claims) {
+//       if (!claims) { return callback(false); }
+//       callback(claims.map(function(city) {
+//         return city.cityname;
+//       }));
+//     });
+//   },
+//   makeLandClaimInactive: function(claimid, callback) {
+//     this.executeQuery('UPDATE land_claims SET isActive = false WHERE claimid = ' + claimid + ' RETURNING *', function(result) {
+//       console.log(!!result, 'update land claim?');
+//       callback(!!result);
+//     });
+//   }
+// };
 
-      });
-    });
-  },
-  checkUsernameAvailable: function(username, callback) {
-    this.executeQuery('SELECT * FROM city_people WHERE username = \'' + username + '\'', function(response) {
-      console.log('response', response);
-      callback(!response.length);
-    });
-  },
-  createNewUser: function(username, lat, long, nearestCity, callback) {
 
-    var handshake = uuid.v1();
 
-    pg.connect(process.env.DATABASE_URL + "?ssl=true", function(err, client, done) {
-      var queryText = 'INSERT INTO city_people (username, hashcode, lat, long, nearestCity) VALUES($1, $2, $3, $4, $5) RETURNING *';
-      client.query(queryText, [username, handshake, lat, long, nearestCity], function(err, result) {
-
-        if (err)  console.error(err);
-
-        done();
-        console.log('created new user ' + JSON.stringify(result.rows[0], null, 2));
-        callback((result && result.rows && result.rows[0]) ? result.rows[0] : null);
-
-      });
-    });
-
-  },
-  verifyUser: function(playerid, hashcode, callback) {
-    pg.connect(process.env.DATABASE_URL + '?ssl=true' , function(err, client, done) {
-      //client.query('SELECT * FROM cities_distance WHERE power(lat - ' + lat + ', 2) + power(long - ' + long +', 2) < 1000', function(err, result) {
-      client.query('SELECT * FROM city_people WHERE playerid = ' + playerid + ' AND hashcode = \'' + hashcode + '\'', function(err, result) {
-        done();
-        if (err) console.log(err);
-        callback((result && result.rows && result.rows[0]) ? result.rows[0] : false);
-
-      });
-    });
-  },
-  getCurrentLeader: function(cityid, callback) {
-    pg.connect(process.env.DATABASE_URL + '?ssl=true' , function(err, client, done) {
-      //client.query('SELECT * FROM cities_distance WHERE power(lat - ' + lat + ', 2) + power(long - ' + long +', 2) < 1000', function(err, result) {
-      client.query('SELECT * FROM land_claims WHERE cityid = ' +cityid + ' AND isActive = true ORDER BY claimDate DESC LIMIT 1', function(err, result) {
-        done();
-        if (err) console.log(err);
-        callback((result && result.rows && result.rows[0]) ? {
-          leaderid: result.rows[0].leaderid,
-          username: result.rows[0].leadername
-        } : null);
-
-      });
-    });
-  },
-  getAllPlayers: function(callback) {
-    pg.connect(process.env.DATABASE_URL + '?ssl=true' , function(err, client, done) {
-      //client.query('SELECT * FROM cities_distance WHERE power(lat - ' + lat + ', 2) + power(long - ' + long +', 2) < 1000', function(err, result) {
-      client.query('SELECT * FROM city_people', function(err, result) {
-        done();
-        if (err) console.log(err);
-        if (!(result && result.rows && result.rows.length)) {
-          return callback(null);
-        }
-        callback(result.rows.map(function(row) {
-          return {
-            playerid: row.playerid,
-            points: row.points,
-            username: row.username
-          };
-        }));
-      });
-    });
-  },
-  incrementPlayer: function(playerid, callback) {
-    this.executeQuery('UPDATE city_people SET points = points + 10 WHERE playerid = ' + playerid + ' RETURNING *', function(result) {
-      //console.log(result);
-      callback(result[0]);
-    });
-  },
-  incrementLandClaim: function(claimid, callback) {
-    this.executeQuery('UPDATE land_claims SET points = points + 10 WHERE claimid = ' + claimid + ' RETURNING *', function(result) {
-      //console.log(result);
-      callback(result[0]);
-    });
-  },
-  claimLand: function(cityid, cityname, username, userid, callback) {
-    //console.log(cityid, cityname, username, userid, lat, long);
-    pg.connect(process.env.DATABASE_URL + "?ssl=true", function(err, client, done) {
-      var queryText = 'INSERT INTO land_claims (cityid, cityname, leadername, leaderid) VALUES($1, $2, $3, $4) RETURNING *';
-      client.query(queryText, [cityid, cityname, username, userid], function(err, result) {
-
-        if (err)  console.error(err);
-
-        done();
-        console.log('created new land claim ' + JSON.stringify(result.rows[0], null, 2));
-        callback((result && result.rows && result.rows[0]) ? result.rows[0] : null);
-
-      });
-    });
-  },
-  getAllLandClaims: function(callback) {
-    this.executeQuery('SELECT * FROM land_claims WHERE isActive = true', callback);
-  },
-  getAllLandClaimsForPlayer: function(playerid, callback) {
-    this.executeQuery('SELECT * FROM land_claims WHERE leaderid = \'' + playerid + '\' AND isActive = true', function(claims) {
-      if (!claims) { return callback(false); }
-      callback(claims.map(function(city) {
-        return city.cityname;
-      }));
-    });
-  },
-  makeLandClaimInactive: function(claimid, callback) {
-    this.executeQuery('UPDATE land_claims SET isActive = false WHERE claimid = ' + claimid + ' RETURNING *', function(result) {
-      console.log(!!result, 'update land claim?');
-      callback(!!result);
-    });
-  }
-};
 
 //dbFunctions.executeQuery('CREATE TABLE cities_distance (cityId serial primary key, cityName VARCHAR(70) not null, country VARCHAR(70), adminCode VARCHAR(70), population integer, lat float not null, long float not null)');
 //CREATE TABLE city_people (playerId serial primary key, username VARCHAR(70) not null, hashcode VARCHAR(70) not null, joinDate timestamp without time zone default (now() at time zone 'utc'), points integer default 0, isBanned boolean default false, lat float not null, long float not null, nearestCity varchar(70) not null)
 
 //CREATE TABLE land_claims (claimId serial primary key, cityId integer not null, cityName VARCHAR(70) not null, leadername VARCHAR(70) not null, leaderid integer not null, claimDate timestamp without time zone default (now() at time zone 'utc'), points integer default 0, isActive boolean default true)
+
+
+function SQL(tableName, fieldObj) {
+  this.tableName = tableName;
+
+  var delimitedVals = function(mappings, del) {
+    var stringVal = function(val) {
+      return JSON.stringify(val).replace(/"/g, "'")
+    };
+    return Object.keys(mappings).map(function(field) {
+      var valFormatted = (fieldObj[field][0].indexOf('varchar') !== -1) ? stringVal(mappings[field]) : mappings[field];
+      return field + ' = ' + valFormatted;
+    }).join(del);
+  };
+
+  this.create = function() {
+    var fieldObj = this.fieldObj;
+    return 'CREATE TABLE ' + tableName + ' (' + Object.keys(fieldObj).map(function(field) {
+      return field + ' ' + fieldObj[field][0] + ' ' + fieldObj[field][1];
+    }).join(', ') + ')';
+  };
+  this.select = function(options) {
+    options = options || {};
+    var parts = ['SELECT', options.what || '*', 'FROM', this.tableName];
+    if (options.where) {
+      parts.push('WHERE');
+      parts.push(delimitedVals(options.where, ' AND '));
+    }
+    if (options.orderBy) {
+      parts.push('ORDER BY');
+      parts.push(options.orderBy);
+    }
+    if (options.extra) {
+      parts.push(options.extra);
+    }
+    return parts.join(' ');
+  };
+  this.update = function(options) {
+    var parts = ['UPDATE', this.tableName, 'SET'];
+    if (!options || !options.data || !options.where) {
+      return console.error('SQL.update needs both options.data and options.where');
+    }
+    parts.push(delimitedVals(options.data, ', '));
+    parts.push('WHERE');
+    parts.push(delimitedVals(options.where, ' AND '));
+    if (options.extra) {
+      parts.push(options.extra);
+    }
+    parts.push('RETURNING *');
+    return parts.join(' ');
+  };
+  this.insert = function(fields) {
+    var parts = ['INSERT INTO', this.tableName, '('];
+    parts.push(fields.join(', '));
+    parts.push(') VALUES (');
+    parts.push(new Array(fields.length).fill(undefined).map(function(val, index) {
+      return '$' + (index + 1);
+    }).join(', '));
+    parts.push(')');
+    parts.push('RETURNING *');
+    console.log(parts.join(' '));
+    return parts.join(' ');
+  };
+}
+
+function TableInterface(pg, databaseUrl, tableName, fieldObj, methods) {
+
+  var sql = new SQL(tableName, fieldObj);
+
+  this.executeQuery = function() {
+    var args = Array.prototype.slice.call(arguments);
+    var callback = (typeof args[args.length - 1] === 'function') ? args.pop() : function() {};
+    pg.connect(databaseUrl, function(err, client, done) {
+      var query = client.query.apply(client, args.concat([function(err, result) {
+        done();
+        if (err) {
+          return console.log(err);
+        }
+        // console.log('executed query ' + args[0]);
+        return callback((result && result.rows) ? result.rows : null);
+      }]));
+    });
+  },
+
+  this.create = function(callback) {
+    this.executeQuery(sql.create(), function(data) {
+      console.log('created table ' + tableName);
+      if (callback) callback(data);
+    });
+  };
+
+  this.select = function(options, callback) {
+    console.log('selecting ', JSON.stringify(options));
+    var query = sql.select(options);
+    console.log(query);
+    this.executeQuery(query, function(response) {
+      console.log('selected table ' + tableName);
+      if (callback) callback(response);
+    });
+  };
+
+  this.update = function(options, callback) {
+    this.executeQuery(sql.update(options), function(response) {
+      if (callback) callback(response);
+    });
+  };
+
+  this.insert = function(data, callback) {
+    console.log(JSON.stringify(data));
+    var vals = Object.keys(data).map(function(key) {
+      return data[key];
+    });
+    this.executeQuery(sql.insert(Object.keys(data)), vals, function(response) {
+      console.log('inserted to  ' + tableName);
+      if (callback) callback(response[0]);
+    });
+  };
+
+  if (methods) {
+    methods.call(this);
+  }
+
+}
+
+
+var LandClaims = new TableInterface(pg, process.env.DATABASE_URL + "?ssl=true", 'land_claims', {
+  claimid: ['serial', 'primary key'],
+  cityid: ['integer', 'not null'],
+  cityname: ['varchar(70)', 'not null'],
+  leadername: ['varchar(70)', 'not null'],
+  leaderid: ['integer', 'not null'],
+  claimdate: ['timestamp', 'without time zone default (now() at time zone \'utc\')'],
+  points: ['integer', 'default 0'],
+  isactive: ['boolean', 'default true']
+}, function() {
+  this.getCurrentLeader = function(cityId, cb) {
+    return LandClaims.select({
+      cityid: cityId,
+      isactive: true
+    }, function(response) {
+      if (!response.length) { return cb(null); }
+      var leader = response[0];
+      cb({
+        leaderid: leader.leaderid,
+        username: leader.leadername
+      });
+    });
+  };
+  this.incrementLandClaim = function(claimid, cb) {
+    return LandClaims.update({
+      data: {
+        points: 'points + 10'
+      },
+      where: {
+        claimid: claimid
+      }
+    }, function(response) {
+      if (!response.length) { return cb(null); }
+      cb(response[0]);
+    });
+  };
+  this.claimLand = function(cityid, cityname, username, userid, cb) {
+    return LandClaims.insert({
+      cityid: cityid,
+      cityname: cityname,
+      leadername: username,
+      leaderid: userid
+    }, function(response) {
+      if (!response.length) { return cb(null); }
+      console.log('created new land claim ' + JSON.stringify(response[0], null, 2));
+      cb(response[0]);
+    });
+  };
+  this.getAllLandClaims = function(cb) {
+    return LandClaims.select({
+      where: {
+        isactive: true
+      }
+    }, cb);
+  };
+  this.getAllLandClaimsForPlayer = function(playerid, cb) {
+    return LandClaims.select({
+      where: {
+        leaderid: playerid,
+        isactive: true
+      }
+    }, function(response) {
+      if (!response) { return callback(false); }
+      cb(response.map(function(claim) {
+        return claim.cityname;
+      }));
+    });
+  };
+  this.makeLandClaimInactive = function(claimid, cb) {
+    return LandClaims.update({
+      data: {
+        isactive: false
+      },
+      where: {
+        claimid: claimid
+      }
+    }, function(response) {
+      cb(response[0]);
+    });
+  };
+});
+
+
+var CitiesDistance = new TableInterface(pg, process.env.DATABASE_URL + "?ssl=true", 'cities_distance', {
+  cityid: ['serial', 'primary key'],
+  cityname: ['varchar(70)', 'not null'],
+  country: ['varchar(70)'],
+  admincode: ['varchar(70)'],
+  population: ['integer'],
+  lat: ['float', 'not null'],
+  long: ['float', 'not null']
+}, function() {
+  this.addNewCity = function(cityName, lat, long, cb) {
+    console.log('creating new city ' + cityName);
+    return this.insert({
+      cityname: cityName,
+      lat, lat,
+      long, long
+    }, cb);
+  };
+  this.getAllCities = function(cb) {
+    return this.select(null, cb)
+  };
+  this.getCitiesNearby = function(lat, long, cb) {
+    return this.select({
+      extra: 'WHERE earth_box(ll_to_earth(' + lat + ', ' + long + '), 50000) @> ll_to_earth(lat, long)'
+    }, function(response) {
+      response = (function addDistance() {
+        return response.map(function(city) {
+          city.distance = Math.sqrt(Math.pow(city.lat - lat, 2) + Math.pow(city.long - long, 2));
+          return city;
+        }).sort(function(a, b) {
+          return a.distance - b.distance;
+        });
+      })();
+      console.log('found near ' + response[0].cityname);
+      cb(response);
+    });
+  };
+});
+
+//dbFunctions.executeQuery('CREATE TABLE cities_distance (cityId serial primary key, cityName VARCHAR(70) not null, country VARCHAR(70), adminCode VARCHAR(70), population integer, lat float not null, long float not null)');
+//CREATE TABLE city_people (playerId serial primary key, username VARCHAR(70) not null, hashcode VARCHAR(70) not null, joinDate timestamp without time zone default (now() at time zone 'utc'), points integer default 0, isBanned boolean default false, lat float not null, long float not null, nearestCity varchar(70) not null)
+
+
+var CityPeople = new TableInterface(pg, process.env.DATABASE_URL + "?ssl=true", 'city_people', {
+  playerid: ['serial', 'primary key'],
+  username: ['varchar(70)', 'not null'],
+  hashcode: ['varchar(70)', 'not null'],
+  joinDate: ['timestamp', 'without time zone default (now() at time zone \'utc\')'],
+  points: ['integer', 'default 0'],
+  isbanned: ['boolean', 'default false'],
+  lat: ['float', 'not null'],
+  long: ['float', 'not null'],
+  nearestcity: ['varchar(70)', 'not null'],
+}, function() {
+  this.getAllPlayers = function(cb) {
+    return this.select(null, function(response) {
+      cb(response.map(function(row) {
+        return {
+          playerid: row.playerid,
+          points: row.points,
+          username: row.username
+        };
+      }));
+    });
+  };
+  this.checkUsernameAvailable = function(username, cb) {
+    return CityPeople.select({
+      where: {
+        username: username
+      }
+    }, function(response) {
+      cb(!response.length);
+    });
+  };
+  this.createNewUser = function(username, hashcode, lat, long, nearestCity, cb) {
+    return CityPeople.insert({
+      username: username,
+      hashcode: hashcode,
+      lat: lat,
+      long: long,
+      nearestcity: nearestCity
+    }, function(response) {
+      console.log('created new user ' + JSON.stringify(response, null, 2));
+      cb(response || null);
+    });
+  };
+  this.verifyUser = function(playerid, hashcode, cb) {
+    return CityPeople.select({
+      where: {
+        playerid: playerid,
+        hashcode: hashcode
+      }
+    }, function(response) {
+      console.log(JSON.stringify(response), 'verify user response')
+      cb(response[0]);
+    });
+  };
+  this.incrementPlayer = function(playerid, cb) {
+    return CityPeople.update({
+      data: {
+        points: 'points + 10'
+      },
+      where: {
+        playerid: playerid
+      }
+    }, function(response) {
+      if (!response.length) { return cb(null); }
+      cb(response[0]);
+    });
+  };
+});
+
 
 //
 const cities = require("all-the-cities");
@@ -361,10 +685,11 @@ io.sockets.on('connection', function (socket) {
       if (!(data.username.length > 3 && data.username.length < 14)) {
         return socket.emit('createUserError', 'Username must be between 3 & 14 characters in length');
       }
-      dbFunctions.checkUsernameAvailable(data.username, function(available) {
+      CityPeople.checkUsernameAvailable(data.username, function(available) {
         console.log('av', available);
         if (!available) { return socket.emit('createUserError', 'Username taken.  Try a different one.'); }
-        dbFunctions.createNewUser(data.username, data.lat, data.long, data.nearestCity, function(result) {
+        var hashcode = uuid.v1();
+        CityPeople.createNewUser(data.username, hashcode, data.lat, data.long, data.nearestCity, function(result) {
           console.log('res' + result);
           if (result) {
             user = Object.assign({}, result, {
@@ -387,10 +712,10 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('verifyUser', function(data) {
     console.log('verifying ' + JSON.stringify(data) );
-    dbFunctions.verifyUser(data.playerid, data.hashcode, function(response) {
+    CityPeople.verifyUser(data.playerid, data.hashcode, function(response) {
       if (!response) { return socket.emit('userResponse', false); }
       console.log('about to login ' + data.playerid);
-      dbFunctions.getAllLandClaimsForPlayer(data.playerid, function(cities) {
+      LandClaims.getAllLandClaimsForPlayer(data.playerid, function(cities) {
         console.log('all land claims', cities);
         console.log('about to login ' + data.playerid);
         var activeEvents = pointsManager.loginUser(data.playerid, socket);
@@ -414,14 +739,14 @@ io.sockets.on('connection', function (socket) {
     user.lat = lat;
     user.long = long;
 
-    dbFunctions.getCitiesNearby(lat, long, function(cities) {
+    CitiesDistance.getCitiesNearby(lat, long, function(cities) {
       socket.emit('citiesNearbyResults', cities);
     });
   });
 
   socket.on('getCurrentLeader', function(cityid) {
     console.log('getting leader of ' + cityid);
-    dbFunctions.getCurrentLeader(cityid, function(response) {
+    LandClaims.getCurrentLeader(cityid, function(response) {
       console.log('found ' + JSON.stringify(response));
       socket.emit('currentLeaderFeedback', response);
     });
@@ -429,11 +754,11 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('conquerCity', function(cityObj) {
     // for when cities do not already have a leader "conquer-type: usurp"
-    dbFunctions.getCurrentLeader(cityObj.cityid, function(response) {
+    LandClaims.getCurrentLeader(cityObj.cityid, function(response) {
       if (response) {
         return socket.emit('conquerResponse', null);
       }
-      dbFunctions.claimLand(cityObj.cityid, cityObj.cityname, user.username, user.playerid, function(response) {
+      LandClaims.claimLand(cityObj.cityid, cityObj.cityname, user.username, user.playerid, function(response) {
         if (response) {
           pointsManager.registerNewLeader(response.claimid, cityObj.cityid, user.playerid);
         }
@@ -452,7 +777,10 @@ io.sockets.on('connection', function (socket) {
     console.log(JSON.stringify(data), 'attack');
     var cityObj = data.city;
     var attackingid = data.leader;
-    dbFunctions.getCurrentLeader(cityObj.cityid, function(response) {
+    if (!cityObj || !attackingid) {
+      return console.log('NOT enough info provided to attackcity');
+    }
+    LandClaims.getCurrentLeader(cityObj.cityid, function(response) {
       if (response.leaderid !== attackingid) {
         return console.log('HACKER', JSON.stringify(response), attackingid);
       }
@@ -527,24 +855,25 @@ var pointsManager = (function() {
 
           //console.log('incrementing points for ' + playerid);
           // increment city_people.points
-          dbFunctions.incrementPlayer(playerid, function(data) {
+          CityPeople.incrementPlayer(playerid, function(data) {
             if (!data) { return console.log('uh oh error updating player'); }
             var newUserpoints = data.points;
             // increment land_claims.points
-            dbFunctions.incrementLandClaim(claimid, function(data) {
+            LandClaims.incrementLandClaim(claimid, function(data) {
               if (!data) { return console.log('uh oh error updating land claim'); }
               // socket emit points increase
               pointsManager.sendTo(playerid, 'pointsUpdate', newUserpoints);
 
               pointsManager.leaderboard.update(playerid, newUserpoints);
-              console.log('succesfully updated points for player ' + playerid);
+              // console.log('succesfully updated points for player ' + playerid);
             });
           });
         }, 10000),
       });
     },
     init: function() {
-      dbFunctions.getAllPlayers(function(players) {
+      console.log('initting')
+      CityPeople.getAllPlayers(function(players) {
         console.log('all players: ');
         console.log(JSON.stringify(players, null, 2));
         // need playerid and points, username
@@ -561,13 +890,12 @@ var pointsManager = (function() {
           });
         });
 
-        dbFunctions.getAllLandClaims(function(claims) {
+        LandClaims.getAllLandClaims(function(claims) {
           console.log(claims);
           claims.forEach(function(claim) {
             pointsManager.addScoreIncrease(claim.claimid, claim.cityid, claim.leaderid);
-          }.bind(this));
-        }.bind(this));
-
+          });
+        });
 
       });
     },
@@ -628,9 +956,9 @@ var pointsManager = (function() {
               }
           }
 
-          dbFunctions.makeLandClaimInactive(relatedClaimId, function(response) {
+          LandClaims.makeLandClaimInactive(relatedClaimId, function(response) {
             if (!response) { return console.log('error making land claim inactive '); }
-            dbFunctions.claimLand(cityObj.cityid, cityObj.cityname, playerusername, playerid, function(response) {
+            LandClaims.claimLand(cityObj.cityid, cityObj.cityname, playerusername, playerid, function(response) {
               if (!response) { return console.log('error making land claim inactive '); }
               pointsManager.addScoreIncrease(response.claimid, cityObj.cityid, playerid);
               pointsManager.sendTo(playerid, 'tookControl', cityObj);
@@ -668,12 +996,12 @@ var pointsManager = (function() {
       pointsManager.sendTo(activeAttacks[attackid].attacking, 'attackBlockSuccess');
     },
     sendTo: function(playerid, evt, obj) {
-      console.log('sending ' + evt + ' and ' + JSON.stringify(obj) + ' to ' + playerid);
+      // console.log('sending ' + evt + ' and ' + JSON.stringify(obj) + ' to ' + playerid);
       if (playerDb[playerid].socket) {
         playerDb[playerid].socket.emit(evt, obj);
         return true;
       }
-      console.log('couldnt get through')
+      // console.log('couldnt get through')
       return false;
     }
   };
