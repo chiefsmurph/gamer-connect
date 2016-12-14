@@ -1087,11 +1087,13 @@ var pointsManager = (function() {
       if (!activeAttacks[attackid]) {
         return console.log('WOAH THERE someone is attacking ' + attackid + ' and it doesn\'t exist');
       }
+
+      pointsManager.sendTo(activeAttacks[attackid].attacker, 'attackFailed');
+      pointsManager.sendTo(activeAttacks[attackid].attacking, 'attackBlockSuccess');
+
       clearTimeout(activeAttacks[attackid].timeout);
       activeAttacks[attackid] = null;
       delete activeAttacks[attackid];
-      pointsManager.sendTo(activeAttacks[attackid].attacker, 'attackFailed');
-      pointsManager.sendTo(activeAttacks[attackid].attacking, 'attackBlockSuccess');
     },
     sendTo: function(playerid, evt, obj) {
       // console.log('sending ' + evt + ' and ' + JSON.stringify(obj) + ' to ' + playerid);
