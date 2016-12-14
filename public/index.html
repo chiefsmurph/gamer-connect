@@ -79,7 +79,7 @@
     padding: 2px 10px;
     font-size: 22px;
   }
-  /*button {
+  button {
     font-size: 21px;
     padding: 5px 15px;
     white-space: normal;
@@ -94,7 +94,7 @@
   }
   button:active, button:focus {
     background-color: #e9e9e9;
-  }*/
+  }
   button#join {
     display: none;
     font-weight: bold;
@@ -174,33 +174,6 @@
     border-top: 10px solid red;
   }
 
-  .btn {
-    background: #3498db;
-    background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
-    background-image: -moz-linear-gradient(top, #3498db, #2980b9);
-    background-image: -ms-linear-gradient(top, #3498db, #2980b9);
-    background-image: -o-linear-gradient(top, #3498db, #2980b9);
-    background-image: linear-gradient(to bottom, #3498db, #2980b9);
-    -webkit-border-radius: 9;
-    -moz-border-radius: 9;
-    border-radius: 9px;
-    font-family: Arial;
-    color: #ffffff;
-    font-size: 20px;
-    padding: 10px 20px 10px 20px;
-    text-decoration: none;
-  }
-
-  .btn:hover {
-    background: #3cb0fd;
-    background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
-    background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
-    background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
-    background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
-    background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
-    text-decoration: none;
-  }
-
   </style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href='https://fonts.googleapis.com/css?family=Audiowide' rel='stylesheet' type='text/css'>
@@ -225,9 +198,9 @@
       <h2>Join the competition</h2>
       <form>
         <label>Username<input type="text" id="username" maxlength="14" autofocus/></label><br><br>
-        <a class="btn" id="getCurrentPosition">Test your geolocation capabilities</a>
+        <button id="getCurrentPosition">Test your geolocation capabilities</button>
         <div id="foundLocation"></div><br>
-        <a class="btn" id="join">Click here to create your account</a>
+        <button id="join">Click here to create your account</button>
         <div id="createUserFeedback"></div>
       </form>
     </div>
@@ -251,9 +224,9 @@
       </div>
       <div class="step3">
         <div id="attackQ"></div>
-        <a class="btn" id="goForIt">Click here to take control of the city</a>
+        <button id="goForIt">Click here to take control of the city</button>
         <div id="attackResults"></div>
-        <a class="btn" class="reset">Click here to refresh this page and try again</a>
+        <button class="reset">Click here to refresh this page and try again</button>
       </div>
     </div>
 
@@ -431,7 +404,7 @@
             app.cue('global.beingAttacked', data);
           });
 
-          $('body').on('click', '.modal.beingAttacked a.btn', function() {
+          $('body').on('click', '.modal.beingAttacked button', function() {
             var $modal = $(this).parent();
             var attackid = $modal.data('attack-id');
             socket.emit('blockAttack', attackid);
@@ -466,16 +439,16 @@
         beingAttacked: function(data) {
           console.log('being attacked', data);
 
-          var $modal = $('<div class="modal beingAttacked">Your city of <b>' + data.city.cityname + '</b> is being attacked by ' + data.attacker + '<br><br><a class="btn">click here to BLOCK THE ATTACK</a></div>');
+          var $modal = $('<div class="modal beingAttacked">Your city of <b>' + data.city.cityname + '</b> is being attacked by ' + data.attacker + '<br><br><button>click here to BLOCK THE ATTACK</button></div>');
           $modal.data('attack-id', data.attackid).show();
           $('body').append($modal);
         }
       },
       init: function() {
 
-        // $('button').on('click', function(e) {
-        //   e.preventDefault();
-        // });
+        $('button').on('click', function(e) {
+          e.preventDefault();
+        });
 
         var onLoad = function() {
           (function getPageFromUrl() {
@@ -709,22 +682,22 @@
                 if (!leader) {
                   $('#conquer-cities .step2 #curLeader').text('No current leader');
                   $('#conquer-cities .step3 #attackQ').text('Would you like to become leader of the city?');
-                  $('#conquer-cities .step3 a.btn#goForIt').data('conquer-type', 'usurp');
+                  $('#conquer-cities .step3 button#goForIt').data('conquer-type', 'usurp');
                 } else if (leader === app.state.username) {
                   $('#conquer-cities .step3 #attackQ').text('You are already the leader of this city.  Go off and conquer more cities.');
                   $('#conquer-cities .step2 #curLeader').text(leader);
                   $('#conquer-cities .step3 #attackQ').addClass('green');
-                  $('#conquer-cities .step3 a.btn#goForIt').hide();
-                  $('#conquer-cities a.btn.reset').show();
+                  $('#conquer-cities .step3 button#goForIt').hide();
+                  $('#conquer-cities button.reset').show();
                 } else {
                   $('#conquer-cities .step2 #curLeader').text(leader);
                   $('#conquer-cities .step3 #attackQ').text('Would you like to try to take over the city in a coup?');
-                  $('#conquer-cities .step3 a.btn#goForIt').text('Click here to attack the leadership of ' + leader);
-                  $('#conquer-cities .step3 a.btn#goForIt').data('conquer-type', 'attack');
+                  $('#conquer-cities .step3 button#goForIt').text('Click here to attack the leadership of ' + leader);
+                  $('#conquer-cities .step3 button#goForIt').data('conquer-type', 'attack');
                 }
               });
 
-              $('#conquer-cities .step3 a.btn#goForIt').one('click', function() {
+              $('#conquer-cities .step3 button#goForIt').one('click', function() {
                 if ($(this).data('conquer-type') === 'usurp') {
                   console.log('conqieruing')
                   socket.emit('conquerCity', app.state.nearestCity);
@@ -734,8 +707,8 @@
                   socket.once('conquerResponse', function(data) {
                     spinners.stop();
                     console.log(data);
-                    $('#conquer-cities .step3 a.btn#goForIt').hide();
-                    $('#conquer-cities a.btn.reset').show();
+                    $('#conquer-cities .step3 button#goForIt').hide();
+                    $('#conquer-cities button.reset').show();
                     if (!data) {
                       return $('#conquer-cities #attackResults').html('Uh oh looks like someone else already snagged this city.').addClass('red');
                     }
@@ -779,7 +752,7 @@
 
             };
 
-            $('#conquer-cities').on('click', 'a.btn.reset', function() {
+            $('#conquer-cities').on('click', 'button.reset', function() {
               app.cue('conquer-cities.reset');
               app.forceReinit('conquer-cities');
               app.navigate.goTo('conquer-cities');
@@ -790,9 +763,9 @@
           reset: function() {
             $('.step2, .step3').hide();
             $('#conquer-cities .step1').show();
-            $('#conquer-cities .step3 a.btn#goForIt').show();
+            $('#conquer-cities .step3 button#goForIt').show();
             $('#attackResults').html('');
-            $('#conquer-cities a.btn.reset').hide();
+            $('#conquer-cities button.reset').hide();
           }
 
         },
