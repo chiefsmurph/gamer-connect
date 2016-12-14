@@ -420,6 +420,7 @@ var LandClaims = new TableInterface(pg, process.env.DATABASE_URL + "?ssl=true", 
     });
   };
   this.claimLand = function(cityid, cityname, username, userid, cb) {
+    console.log(cityid, cityname, username, userid, 'turkey');
     return LandClaims.insert({
       cityid: cityid,
       cityname: cityname,
@@ -698,8 +699,8 @@ io.sockets.on('connection', function (socket) {
       return includesBad;
     };
 
-    console.log(JSON.stringify(data), 'newuserdata');
-    console.log(JSON.stringify(user));
+    //console.log(JSON.stringify(data), 'newuserdata');
+    //console.log(JSON.stringify(user));
     if (data.lat === user.lat && data.long === user.long) {
       if (!(data.username.length > 3 && data.username.length < 14)) {
         return socket.emit('createUserError', 'Username must be between 3 & 14 characters in length');
@@ -712,7 +713,7 @@ io.sockets.on('connection', function (socket) {
         if (!available) { return socket.emit('createUserError', 'Username taken.  Try a different one.'); }
         var hashcode = uuid.v1();
         CityPeople.createNewUser(data.username, hashcode, data.lat, data.long, data.nearestCity, function(result) {
-          console.log('res' + result);
+          //console.log('res' + result);
           if (!result) { return socket.emit('createUserError', 'Error creating user'); }
           user = Object.assign({}, result, {
             loggedIn: true
@@ -730,7 +731,7 @@ io.sockets.on('connection', function (socket) {
   });
 
   socket.on('verifyUser', function(data) {
-    console.log('verifying ' + JSON.stringify(data) );
+    //console.log('verifying ' + JSON.stringify(data) );
     CityPeople.verifyUser(data.playerid, data.hashcode, function(response) {
       if (!response) { return socket.emit('userResponse', false); }
       console.log('about to login ' + data.playerid);
@@ -741,7 +742,7 @@ io.sockets.on('connection', function (socket) {
         user = Object.assign({}, response, {
           loggedIn: true
         });
-        console.log(JSON.stringify(response) + 'res');
+        //console.log(JSON.stringify(response) + 'res');
         socket.emit('userResponse', Object.assign({}, {
           points: response.points,
           cities: cities
@@ -867,6 +868,7 @@ var pointsManager = (function() {
             };
             if (beforeTop10Pos > 10 || !beforeTop10Pos) {
               // include cities if just breaking into top 10
+              console.log(beforeTop10Pos, afterTop10Pos);
               console.log('including playerDb[playerid].cities because new to the leaderboard')
               console.log('playerdb[playerid].cities', JSON.stringify(playerDb[playerid].cities));
               toPass.cities = playerDb[playerid].cities;
@@ -1034,7 +1036,7 @@ var pointsManager = (function() {
                 playerDb[attackingid].timeouts.splice(i);                 // remove timeout object
               }
           }
-
+          console.log(relatedClaimId);
           LandClaims.makeLandClaimInactive(relatedClaimId, function(response) {
             if (!response) { return console.log('error making land claim inactive '); }
             LandClaims.claimLand(cityObj.cityid, cityObj.cityname, playerusername, playerid, function(response) {
