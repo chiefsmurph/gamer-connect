@@ -850,22 +850,22 @@ var pointsManager = (function() {
 
           if (dataUpdate.points) {
 
-            var beforeTop10 = this.getTop10();
+            var beforeTop10Pos = this.getPositionOfPlayer(playerid);
             if (dataUpdate.points) playerDb[playerid].points = dataUpdate.points;
             var newscore = playerDb[playerid].points;
 
             //console.log('updated ');
             //console.log(data);
             this.refreshLeaderboard();
-            var top10 = this.getTop10();
+            var afterTop10Pos = this.getPositionOfPlayer(playerid);
 
-            if (top10.length && !(newscore >= top10[top10.length - 1].points)) { return console.log('not in top 10'); }
+            if (afterTop10Pos > 10) { return console.log('not in top 10'); }
 
             var toPass = {
               username: playerDb[playerid].username,
               points: dataUpdate.points
             };
-            if (!beforeTop10.length || newscore < beforeTop10[beforeTop10.length - 1].points) {
+            if (beforeTop10Pos > 10 || !beforeTop10Pos) {
               // include cities if just breaking into top 10
               console.log('including playerDb[playerid].cities because new to the leaderboard')
               console.log('playerdb[playerid].cities', JSON.stringify(playerDb[playerid].cities));
@@ -895,6 +895,8 @@ var pointsManager = (function() {
             };
           }).sort(function(a, b) {
             return b.points - a.points;
+          }).filter(function(player) {
+            return player.points > 0;
           });
         },
         getTop10: function() {
