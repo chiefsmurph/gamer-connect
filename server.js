@@ -916,7 +916,7 @@ var pointsManager = (function() {
       }
     })(),
     addScoreIncrease: function(claimid, cityid, playerid) {
-      //console.log(claimid, cityid, playerid);
+      console.log(claimid, cityid, playerid);
       playerDb[playerid].timeouts = playerDb[playerid].timeouts || [];
       playerDb[playerid].timeouts.push({
         claimid: claimid,
