@@ -860,13 +860,13 @@ var pointsManager = (function() {
             this.refreshLeaderboard();
             var afterTop10Pos = this.getPositionOfPlayer(playerid);
 
-            if (afterTop10Pos > 10) { return console.log('not in top 10'); }
+            if (afterTop10Pos > 9) { return console.log('not in top 10'); }
 
             var toPass = {
               username: playerDb[playerid].username,
               points: dataUpdate.points
             };
-            if (beforeTop10Pos > 10 || !beforeTop10Pos) {
+            if (beforeTop10Pos > 9) {
               // include cities if just breaking into top 10
               console.log(beforeTop10Pos, afterTop10Pos);
               console.log('including playerDb[playerid].cities because new to the leaderboard')
@@ -982,7 +982,7 @@ var pointsManager = (function() {
         return console.log('we have a problem.  user ' + playerid + ' tried to login but we have no account of them');
       }
 
-      console.log('logged in ' + playerid + 'socket', socket);
+      //console.log('logged in ' + playerid + 'socket', socket);
       playerDb[playerid].socket = socket;
       return {
         missedAttacks: playerDb[playerid].missedAttacks,

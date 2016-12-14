@@ -493,7 +493,7 @@
 
                 $('#attackModal').show();
 
-                if (i === response.missedAttacks.length - 1) {
+                if (i === response.activeAttacksOutgoing.length - 1) {
                   return;
                 }
                 setTimeout(function() {
@@ -603,6 +603,7 @@
             // $('.username').text(app.state.username);
           },
           updateCurrentCities: function(cities) {
+            app.set({ cities: cities });
             console.log(cities,'cities')
             $('#your-cities').toggle(!!cities.length);
             $('#your-cities ul').html(cities.map(function(city) {
