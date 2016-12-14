@@ -555,7 +555,7 @@
 
             var $username = this.$username;
             $username.focus();
-            $('#join').on('click', function() {
+            $('#join').one('click', function() {
 
               var loading = new loadingSpinner($('#createUserFeedback'));
 
@@ -794,7 +794,7 @@
             })();
             if (index === -1) {
               this.top10.push(row);
-              return console.error('tried updating username that doesnt exist');
+              return console.log('new user to the leaderboard');
             }
             this.top10[index] = Object.assign({}, this.top10[index], row);
             this.top10.sort(function(a, b) {

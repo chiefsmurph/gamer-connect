@@ -713,20 +713,17 @@ io.sockets.on('connection', function (socket) {
         var hashcode = uuid.v1();
         CityPeople.createNewUser(data.username, hashcode, data.lat, data.long, data.nearestCity, function(result) {
           console.log('res' + result);
-          if (result) {
-            user = Object.assign({}, result, {
-              loggedIn: true
-            });
-            pointsManager.registerNewPlayer(result.playerid, user.username, socket);
-            return socket.emit('createUserSuccess', {
-              playerid: result.playerid,
-              username: result.username,
-              hashcode: result.hashcode,
-              points: result.points
-            });
-          } else {
-            return socket.emit('createUserError', 'Error creating user');
-          }
+          if (!result) { return socket.emit('createUserError', 'Error creating user'); }
+          user = Object.assign({}, result, {
+            loggedIn: true
+          });
+          pointsManager.registerNewPlayer(result.playerid, user.username, socket);
+          return socket.emit('createUserSuccess', {
+            playerid: result.playerid,
+            username: result.username,
+            hashcode: result.hashcode,
+            points: result.points
+          });
         });
       });
     }
@@ -869,14 +866,18 @@ var pointsManager = (function() {
             };
             if (!beforeTop10.length || newscore < beforeTop10[beforeTop10.length - 1].points) {
               // include cities if just breaking into top 10
+              console.log('including playerDb[playerid].cities because new to the leaderboard')
+              console.log('playerdb[playerid].cities', JSON.stringify(playerDb[playerid].cities));
               toPass.cities = playerDb[playerid].cities;
             }
             io.sockets.emit('top10update', toPass);
           } else if (dataUpdate.cities) {
+            console.log('sending dataupdate.cities')
             io.sockets.emit('top10update', {
               username: playerDb[playerid].username,
               cities: dataUpdate.cities
             });
+            console.log('JSON')
           }
         },
         getTop10: function() {
@@ -998,10 +999,17 @@ var pointsManager = (function() {
     registerNewLeader(claimid, cityid, playerid) {
       console.log('registering new leader ', cityid, playerid);
       // when land_claims db has been updated and there was no previous leader
+      this.addToCitiesAndUpdate(playerid, cityid);
       this.addScoreIncrease(claimid, cityid, playerid);
     },
     handleDisconnect: function(playerid) {
       if (playerDb[playerid]) playerDb[playerid].socket = null;
+    },
+    addToCitiesAndUpdate: function(id, cityname) {
+      playerDb[id].cities.push(cityname);
+      pointsManager.leaderboard.update(id, {
+        cities: playerDb[id].cities
+      });
     },
     newAttack: function(playerid, playerusername, attackingid, cityObj) {
       var attackid = uuid.v1();
@@ -1032,9 +1040,10 @@ var pointsManager = (function() {
                 city !== cityObj.cityname;
               });
               // add city to attacker's cities
-              playerDb[playerid].cities.push(cityObj.cityname);
+              playerDb[playerid].cities.push(cityname);
               // update leaderboard which handles emitting if either user in top 10
               [attackingid, playerid].forEach(function(id) {
+                console.log('about to leaderboard update with cities', JSON.stringify(playerDb[id].cities));
                 pointsManager.leaderboard.update(id, {
                   cities: playerDb[id].cities
                 });
