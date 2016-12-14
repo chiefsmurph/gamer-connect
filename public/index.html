@@ -89,7 +89,7 @@
     outline-width: 0;
     cursor: pointer;
   }
-  button:hover {
+  .no-touch button:hover {
     background-color: lightgoldenrodyellow;
   }
   button:active, button:focus {
@@ -445,6 +445,10 @@
         }
       },
       init: function() {
+
+        if (!app.isMobile) {
+          $('body').addClass('no-touch');
+        }
 
         $('button').on('click', function(e) {
           e.preventDefault();
