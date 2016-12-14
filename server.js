@@ -1002,7 +1002,7 @@ var pointsManager = (function() {
       };
     },
     registerNewLeader(claimid, cityObj, playerid) {
-      console.log('registering new leader ', cityid, playerid);
+      console.log('registering new leader ', cityObj.cityname, playerid);
       // when land_claims db has been updated and there was no previous leader
       this.addToCitiesAndUpdate(playerid, cityObj.cityname);
       this.addScoreIncrease(claimid, cityObj.cityid, playerid);
