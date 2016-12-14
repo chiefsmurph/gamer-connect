@@ -448,6 +448,7 @@
       init: function() {
 
         $('button').on('click', function(e) {
+          this.blur();
           e.preventDefault();
         });
 
