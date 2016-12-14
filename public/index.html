@@ -82,6 +82,7 @@
   button {
     font-size: 21px;
     padding: 5px 35px;
+    white-space: normal;
   }
   button#join {
     display: none;
@@ -260,6 +261,14 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 
   <script>
+  function preload(arrayOfImages) {
+      $(arrayOfImages).each(function(){
+          $('<img/>')[0].src = this;
+          // Alternatively you could use:
+          // (new Image()).src = this;
+      });
+  }
+  preload(['/img/loading.gif']);
   var loadingSpinner = function($where) {
     $where.html('<img src="/img/loading.gif" class="spinner" />');
     this.doneLoading = function() {
