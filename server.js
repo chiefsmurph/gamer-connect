@@ -1088,6 +1088,8 @@ var pointsManager = (function() {
         return console.log('WOAH THERE someone is attacking ' + attackid + ' and it doesn\'t exist');
       }
       clearTimeout(activeAttacks[attackid].timeout);
+      activeAttacks[attackid] = null;
+      delete activeAttacks[attackid];
       pointsManager.sendTo(activeAttacks[attackid].attacker, 'attackFailed');
       pointsManager.sendTo(activeAttacks[attackid].attacking, 'attackBlockSuccess');
     },
