@@ -782,6 +782,7 @@
             this.renderTop10();
           },
           update: function(row) {
+            console.info(row);
             var top10 = this.top10;
             var index = (function getRelatedIndex() {
               for (var i = 0; i < top10.length; i++) {
