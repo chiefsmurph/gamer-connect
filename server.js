@@ -780,7 +780,7 @@ io.sockets.on('connection', function (socket) {
       }
       LandClaims.claimLand(cityObj.cityid, cityObj.cityname, user.username, user.playerid, function(response) {
         if (response) {
-          pointsManager.registerNewLeader(response.claimid, cityObj.cityid, user.playerid);
+          pointsManager.registerNewLeader(response.claimid, cityObj, user.playerid);
         }
         return socket.emit('conquerResponse', response);
       });
@@ -1001,11 +1001,11 @@ var pointsManager = (function() {
         })
       };
     },
-    registerNewLeader(claimid, cityid, playerid) {
+    registerNewLeader(claimid, cityObj, playerid) {
       console.log('registering new leader ', cityid, playerid);
       // when land_claims db has been updated and there was no previous leader
-      this.addToCitiesAndUpdate(playerid, cityid);
-      this.addScoreIncrease(claimid, cityid, playerid);
+      this.addToCitiesAndUpdate(playerid, cityObj.cityname);
+      this.addScoreIncrease(claimid, cityObj.cityid, playerid);
     },
     handleDisconnect: function(playerid) {
       if (playerDb[playerid]) playerDb[playerid].socket = null;
