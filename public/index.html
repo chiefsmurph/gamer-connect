@@ -15,7 +15,7 @@
     margin: 0;
   }
   #container > h1 {
-    padding: 3px 0 0 3px;
+    padding: 6px 0 0 6px;
   }
   h2 {
     margin: 0 0 10px 0;
@@ -256,6 +256,9 @@
     visibility: hidden;
   }
   @media (max-width: 800px) {
+    body:not(.no-touch) #container > h1 {
+      text-align: center;
+    }
     body:not(.no-touch) #period-chooser {
       margin-left: -20px;
     }
