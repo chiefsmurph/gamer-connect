@@ -241,8 +241,9 @@
     text-align: right;
   }
   #period-chooser > div:nth-child(2) {
-    flex-basis: 3%;
+    flex-basis: 33%;
     padding-left: 0px;
+    width: 150px;
   }
   #period-chooser > div:not(.selectedPeriod) b {
     cursor: pointer;
@@ -259,6 +260,9 @@
   @media (max-width: 800px) {
     body:not(.no-touch) #container > h1 {
       text-align: center;
+    }
+    body:not(.no-touch) .datagrid {
+      font-size: 2vw;
     }
     body:not(.no-touch) #period-chooser {
       margin-left: -20px;
