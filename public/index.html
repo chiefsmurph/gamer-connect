@@ -356,6 +356,10 @@
 </head>
 <body>
 
+  <div class="modal loading">
+    <img src="/img/loading.gif" />
+  </div>
+
   <div id="container">
 
     <h1>City Leaders</h1>
@@ -681,7 +685,11 @@
             }
             app.navigate.goTo(page);
           })();
-          $('#container').show();
+
+          setTimeout(function() {
+            $('.modal.loading').hide();
+            $('#container').show();
+          }, 500);
         };
 
         if (!navigator.geolocation) {
