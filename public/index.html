@@ -15,7 +15,7 @@
     margin: 0;
   }
   #container > h1 {
-    padding: 6px 0 0 6px;
+    padding: 20px 0 0 6px;
   }
   h2 {
     margin: 0 0 10px 0;
@@ -43,7 +43,7 @@
     margin: 0 0 10px;
   }
   .page {
-    margin: 0 10px;
+    margin: 0 20px;
     overflow-y: scroll;
   }
   #nav a {
@@ -689,7 +689,7 @@
           setTimeout(function() {
             $('.modal.loading').hide();
             $('#container').show();
-          }, 500);
+          }, 1500);
         };
 
         if (!navigator.geolocation) {
@@ -1030,9 +1030,17 @@
             });
 
             $('#leaderboard .today tbody td:contains(' + app.state.username + ')').parent().css('background-color', 'yellow');
+            console.log('here');
 
-            var maxTableHeight = Math.max(parseInt($('#tables .today').height()), parseInt($('#tables .overall').height())) + 4;
+            var maxTableHeight = this.top10.length * 40 + 50;
             $('#tables').css('height', maxTableHeight + 'px');
+            // setTimeout(function() {
+            //   var maxTableHeight = Math.max(  parseInt($('#tables .today').height()), parseInt($('#tables .overall').height())) + 4;
+            //   console.log('maxTableHeight', maxTableHeight);
+            //
+            //   console.log('there')
+            // }, 1000);
+
           },
 
           setAndRender: function(data) {
