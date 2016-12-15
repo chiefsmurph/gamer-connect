@@ -356,7 +356,7 @@
 </head>
 <body>
 
-  <div class="modal loading" style="display: block">
+  <div class="loading" style="position: absolute; width: 100%; text-align: center; top: 20%; zoom: 140%">
     <img src="/img/loading.gif" />
   </div>
 
@@ -687,7 +687,7 @@
           })();
 
           setTimeout(function() {
-            $('.modal.loading').hide();
+            $('.loading').hide();
             $('#container').show();
           }, 300);
         };
