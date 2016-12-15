@@ -356,7 +356,7 @@
 </head>
 <body>
 
-  <div class="modal loading">
+  <div class="modal loading" style="display: block">
     <img src="/img/loading.gif" />
   </div>
 
@@ -689,7 +689,7 @@
           setTimeout(function() {
             $('.modal.loading').hide();
             $('#container').show();
-          }, 1500);
+          }, 300);
         };
 
         if (!navigator.geolocation) {
