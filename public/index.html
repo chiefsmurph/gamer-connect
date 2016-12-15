@@ -30,6 +30,9 @@
   body * {
     font-family: 'Audiowide', cursive;
   }
+  html, body {
+    overflow:hidden;
+  }
   body {
     padding: 1px;
   }
@@ -642,6 +645,13 @@
         }
       },
       init: function() {
+
+        $(window).on(
+          'touchmove',
+           function(e) {
+            e.preventDefault();
+          }
+        );
 
         if (!app.isMobile) {
           $('body').addClass('no-touch');
