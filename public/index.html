@@ -1017,7 +1017,10 @@
               $tbody.append('<tr><td>' + (i + 1) + '</td><td><span>' + row.username + '</span></td><td>' + row.points + '</td></tr>');
             });
 
-            $('#leaderboard tbody td:contains(' + app.state.username + ')').parent().css('background-color', 'yellow');
+            $('#leaderboard .today tbody td:contains(' + app.state.username + ')').parent().css('background-color', 'yellow');
+
+            var maxTableHeight = Math.max(parseInt($('#leaderboard.today').height()), parseInt($('#leaderboard.overall'));
+            $('#tables').css('height', maxTableHeight + 'px');
           },
 
           setAndRender: function(data) {
