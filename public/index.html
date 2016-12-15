@@ -1022,7 +1022,7 @@
 
             $('#leaderboard .today tbody td:contains(' + app.state.username + ')').parent().css('background-color', 'yellow');
 
-            var maxTableHeight = Math.max(parseInt($('#leaderboard .today').height()), parseInt($('#leaderboard .overall')));
+            var maxTableHeight = Math.max(parseInt($('#tables .today').height()), parseInt($('#tables .overall').height()));
             $('#tables').css('height', maxTableHeight + 'px');
           },
 
