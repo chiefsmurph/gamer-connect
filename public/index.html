@@ -242,8 +242,11 @@
     visibility: hidden;
   }
   @media (max-width: 800px) {
-    #period-chooser {
-      /*zoom: 50%;*/
+    #period-chooser .switch {
+      zoom: 50%;
+    }
+    :not(.no-touch) #period-chooser > div:nth-child(3) {
+      padding-left: 30px;
     }
   }
   #period-chooser .switch {
