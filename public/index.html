@@ -31,7 +31,9 @@
     font-family: 'Audiowide', cursive;
   }
   html, body {
-    overflow:hidden;
+    overflow-x:hidden;
+    padding: 0;
+    margin: 0;
   }
   body {
     padding: 1px;
@@ -649,7 +651,7 @@
         $(window).on(
           'touchmove',
            function(e) {
-            e.preventDefault();
+            // e.preventDefault();
           }
         );
 
