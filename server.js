@@ -701,33 +701,32 @@ io.sockets.on('connection', function (socket) {
 
     //console.log(JSON.stringify(data), 'newuserdata');
     //console.log(JSON.stringify(user));
-    if (data.lat === user.lat && data.long === user.long) {
-      if (!(data.username.length > 3 && data.username.length < 14)) {
+    if (data.lat != user.lat && data.long != user.long) {
+      return socket.emit('SUCK it HACKz0r');
+    } else if (!(data.username.length > 3 && data.username.length < 14)) {
         return socket.emit('createUserError', 'Username must be between 3 & 14 characters in length');
-      }
-      if (checkForBadWords(data.username)) {
+    } else if (checkForBadWords(data.username)) {
         return socket.emit('createUserError', 'Don\'t be a dumbass.  No swearing allowed in your username');
-      }
-      CityPeople.checkUsernameAvailable(data.username, function(available) {
-        console.log('av', available);
-        if (!available) { return socket.emit('createUserError', 'Username taken.  Try a different one.'); }
-        var hashcode = uuid.v1();
-        CityPeople.createNewUser(data.username, hashcode, data.lat, data.long, data.nearestCity, function(result) {
-          //console.log('res' + result);
-          if (!result) { return socket.emit('createUserError', 'Error creating user'); }
-          user = Object.assign({}, result, {
-            loggedIn: true
-          });
-          pointsManager.registerNewPlayer(result.playerid, user.username, socket);
-          return socket.emit('createUserSuccess', {
-            playerid: result.playerid,
-            username: result.username,
-            hashcode: result.hashcode,
-            points: result.points
-          });
+    }
+    CityPeople.checkUsernameAvailable(data.username, function(available) {
+      console.log('av', available);
+      if (!available) { return socket.emit('createUserError', 'Username taken.  Try a different one.'); }
+      var hashcode = uuid.v1();
+      CityPeople.createNewUser(data.username, hashcode, data.lat, data.long, data.nearestCity, function(result) {
+        //console.log('res' + result);
+        if (!result) { return socket.emit('createUserError', 'Error creating user'); }
+        user = Object.assign({}, result, {
+          loggedIn: true
+        });
+        pointsManager.registerNewPlayer(result.playerid, user.username, socket);
+        return socket.emit('createUserSuccess', {
+          playerid: result.playerid,
+          username: result.username,
+          hashcode: result.hashcode,
+          points: result.points
         });
       });
-    }
+    });
   });
 
   socket.on('verifyUser', function(data) {
@@ -803,13 +802,16 @@ io.sockets.on('connection', function (socket) {
     }
     LandClaims.getCurrentLeader(cityObj.cityid, function(response) {
       if (response.leaderid !== attackingid || response.leaderid === user.playerid) {
+        socket.emit('attackError', 'Attack error: the leader has changed since you loaded the page.');
         return console.log('HACKER', JSON.stringify(response), attackingid);
       }
       console.log('user obj ' + JSON.stringify(user), attackingid, cityObj);
       var attackid = pointsManager.newAttack(user.playerid, user.username, attackingid, cityObj);
+      if (!attackid) {
+        return socket.emit('attackError', 'Attack error: ' + response.username + ' already under attack from another player.');
+      }
       socket.emit('attackConfirm', attackid);
       console.log('')
-
     });
   });
 
@@ -879,7 +881,7 @@ var pointsManager = (function() {
             console.log('sending dataupdate.cities');
             playerDb[playerid].cities = dataUpdate.cities;
 
-            if (this.getPositionOfPlayer(playerid) > 10) { return; }
+            if (this.getPositionOfPlayer(playerid) > 9) { return; }
 
             io.sockets.emit('top10update', {
               username: playerDb[playerid].username,
@@ -1020,6 +1022,14 @@ var pointsManager = (function() {
       });
     },
     newAttack: function(playerid, playerusername, attackingid, cityObj) {
+
+      if (Object.keys(activeAttacks).filter(function(attackid) {
+        return activeAttacks[attackid].attacking === attackingid;
+      }).length) {
+        // someone already attacking this user
+        return null;
+      }
+
       var attackid = uuid.v1();
       activeAttacks[attackid] = {
         attacker: playerid,
@@ -1027,18 +1037,8 @@ var pointsManager = (function() {
         cityObj: cityObj,
         timeout: new setTimeout(function() {
           console.log('attack won, ' + playerid + ' took ' + cityObj.cityname + ' from ' + attackingid);
-          var relatedClaimId;
-          // remove score increment timeout from attackers' timeouts
-          for (var i=0 ; i<playerDb[attackingid].timeouts.length; i++) {
-              if (playerDb[attackingid].timeouts[i].cityid === cityObj.cityid) {
-                relatedClaimId = playerDb[attackingid].timeouts[i].claimid;
-                clearInterval(playerDb[attackingid].timeouts[i].timeout); // stop interval
-                playerDb[attackingid].timeouts.splice(i);                 // remove timeout object
-              }
-          }
-          console.log(relatedClaimId);
-          LandClaims.makeLandClaimInactive(relatedClaimId, function(response) {
-            if (!response) { return console.log('error making land claim inactive '); }
+
+          var claimLandAndUpdate = function() {
             LandClaims.claimLand(cityObj.cityid, cityObj.cityname, playerusername, playerid, function(response) {
               if (!response) { return console.log('error making land claim inactive '); }
               pointsManager.addScoreIncrease(response.claimid, cityObj.cityid, playerid);
@@ -1070,8 +1070,31 @@ var pointsManager = (function() {
               activeAttacks[attackid] = null;
               delete activeAttacks[attackid];
             });
+          };
 
-          });
+          (function makeRelatedClaimInactive() {
+            var relatedClaimId;
+            // remove score increment timeout from attackers' timeouts
+            for (var i=0 ; i<playerDb[attackingid].timeouts.length; i++) {
+                if (playerDb[attackingid].timeouts[i].cityid === cityObj.cityid) {
+                  relatedClaimId = playerDb[attackingid].timeouts[i].claimid;
+                  clearInterval(playerDb[attackingid].timeouts[i].timeout); // stop interval
+                  playerDb[attackingid].timeouts.splice(i);                 // remove timeout object
+                }
+            }
+            console.log(relatedClaimId);
+
+            if (!relatedClaimId) {
+              console.log('unable to find related landclaim...but moving on....');
+              return claimLandAndUpdate();
+            } else {
+              LandClaims.makeLandClaimInactive(relatedClaimId, function(response) {
+                if (!response) { return console.log('error making land claim inactive '); }
+                return claimLandAndUpdate();
+              });
+            }
+          })();
+
         }, 60000)
       };
 
@@ -1084,7 +1107,6 @@ var pointsManager = (function() {
       });
 
       return attackid;
-
 
     },
     attackBlock: function(attackid) {

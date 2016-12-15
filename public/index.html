@@ -131,13 +131,16 @@
   #conquer-cities button {
     margin-top: 10px;
   }
-  #leaderboard {
-    font-size: 150%;
+  #leaderboard table {
+    font-size: 220%;
   }
   #leaderboard thead {
     letter-spacing: 2px;
   }
-  #leaderboard * {
+  #leaderboard thead th:first-of-type {
+    width: 5%;
+  }
+  #leaderboard > * {
     cursor: default;
   }
   #leaderboard #tooltip {
@@ -153,8 +156,18 @@
   #attackResults {
     margin-top: 1em;
   }
+  .datagrid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
   .datagrid table { border-collapse: collapse; text-align: left; width: 100%; font-size: 80%; } .datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: #fff; overflow: hidden; border: 1px solid #006699; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }.datagrid table td, .datagrid table th { padding: 3px 10px; }.datagrid table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; color:#ffffff; font-weight: bold; border-left: 1px solid #0070A8; } .datagrid table thead th:first-child { border: none; }.datagrid table tbody td { color: #00496B; border-left: 1px solid #E1EEF4;font-weight: normal; }.datagrid table tbody .alt td { background: #E1EEF4; color: #00496B; }.datagrid table tbody td:first-child { border-left: none; }.datagrid table tbody tr:last-child td { border-bottom: none; }.datagrid table tfoot td div { border-top: 1px solid #006699;background: #E1EEF4;} .datagrid table tfoot td { padding: 0; } .datagrid table tfoot td div{ padding: 2px; }.datagrid table tfoot td ul { margin: 0; padding:0; list-style: none; text-align: right; }.datagrid table tfoot  li { display: inline; }.datagrid table tfoot li a { text-decoration: none; display: inline-block;  padding: 2px 8px; margin: 1px;color: #FFFFFF;border: 1px solid #006699;-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; }.datagrid table tfoot ul.active, .datagrid table tfoot ul a:hover { text-decoration: none;border-color: #006699; color: #FFFFFF; background: none; background-color:#00557F;}div.dhtmlx_window_active, div.dhx_modal_cover_dv { position: fixed !important; }
-
+  .overall {
+    display: none;
+  }
+  .overall table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #993300), color-stop(1, #99001a) );background:-moz-linear-gradient( center top, #993300 5%, #99001a 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#993300', endColorstr='##99001a');background-color:#993300; color:#ffffff; font-weight: bold; border-left: 1px solid #0070A8; } .datagrid table thead th:first-child { border: none; }.datagrid table tbody td { color: #00496B; border-left: 1px solid #E1EEF4;font-weight: normal; }.datagrid table tbody .alt td { background: #E1EEF4; color: #00496B; }.datagrid table tbody td:first-child { border-left: none; }.datagrid table tbody tr:last-child td { border-bottom: none; }.datagrid table tfoot td div { border-top: 1px solid #006699;background: #E1EEF4;} .datagrid table tfoot td { padding: 0; } .datagrid table tfoot td div{ padding: 2px; }.datagrid table tfoot td ul { margin: 0; padding:0; list-style: none; text-align: right; }.datagrid table tfoot  li { display: inline; }.datagrid table tfoot li a { text-decoration: none; display: inline-block;  padding: 2px 8px; margin: 1px;color: #FFFFFF;border: 1px solid #006699;-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; }.datagrid table tfoot ul.active, .datagrid table tfoot ul a:hover { text-decoration: none;border-color: #006699; color: #FFFFFF; background: none; background-color:#00557F;}div.dhtmlx_window_active, div.dhx_modal_cover_dv { position: fixed !important; }
+  /*993300*/
   .modal {
     position: absolute;
     left: 50%;
@@ -172,6 +185,127 @@
   .modal.beingAttacked, .modal#attackFailed, .modal#dethroned {
     background-color: rgba(200,10,10,0.9);
     border-top: 10px solid red;
+  }
+
+  /*leaderboard switch*/
+  #period-chooser {
+  	display: -ms-flexbox;
+  	display: -webkit-flex;
+  	display: flex;
+
+  	-ms-flex-align: center;
+  	-webkit-align-items: center;
+  	-webkit-box-align: center;
+
+  	align-items: center;
+    justify-content: center;
+
+    margin-bottom: 1vh;
+    height: 67px;
+  }
+  #period-chooser > div {
+    flex-basis: 100%;
+  }
+  #period-chooser b {
+    -webkit-transition: font-size 1s;
+       -moz-transition: font-size 1s;
+         -o-transition: font-size 1s;
+            transition: font-size 1s;
+            color: grey;
+  }
+  #period-chooser .selectedPeriod b {
+    font-size: 150%;
+    color: black;
+  }
+  #period-chooser > div:nth-child(1) {
+    padding-right: 2.5vw;
+    text-align: right;
+  }
+  #period-chooser > div:nth-child(2) {
+    flex-basis: 3%;
+    padding-left: 0px;
+  }
+  #period-chooser > div:not(.selectedPeriod) b {
+    cursor: pointer;
+  }
+  #period-chooser > div:nth-child(3) {
+    padding-left: 2.5vw;
+  }
+  .cmn-toggle {
+    position: absolute;
+    margin-left: -9999px;
+    cursor: pointer;
+    visibility: hidden;
+  }
+  .cmn-toggle + label {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+  }
+  input.cmn-toggle-round-flat + label {
+    padding: 2px;
+    width: 120px;
+    height: 60px;
+    background-color: #006699;
+    -webkit-border-radius: 60px;
+    -moz-border-radius: 60px;
+    -ms-border-radius: 60px;
+    -o-border-radius: 60px;
+    border-radius: 60px;
+    -webkit-transition: background 0.4s;
+    -moz-transition: background 0.4s;
+    -o-transition: background 0.4s;
+    transition: background 0.4s;
+  }
+  input.cmn-toggle-round-flat + label:before, input.cmn-toggle-round-flat + label:after {
+    display: block;
+    position: absolute;
+    content: "";
+  }
+  input.cmn-toggle-round-flat + label:before {
+    top: 2px;
+    left: 2px;
+    bottom: 2px;
+    right: 2px;
+    background-color: #fff;
+    -webkit-border-radius: 60px;
+    -moz-border-radius: 60px;
+    -ms-border-radius: 60px;
+    -o-border-radius: 60px;
+    border-radius: 60px;
+    -webkit-transition: background 0.4s;
+    -moz-transition: background 0.4s;
+    -o-transition: background 0.4s;
+    transition: background 0.4s;
+  }
+  input.cmn-toggle-round-flat + label:after {
+    top: 4px;
+    left: 4px;
+    bottom: 4px;
+    width: 52px;
+    background-color: #006699;
+    -webkit-border-radius: 52px;
+    -moz-border-radius: 52px;
+    -ms-border-radius: 52px;
+    -o-border-radius: 52px;
+    border-radius: 52px;
+    -webkit-transition: margin 0.4s, background 0.4s;
+    -moz-transition: margin 0.4s, background 0.4s;
+    -o-transition: margin 0.4s, background 0.4s;
+    transition: margin 0.4s, background 0.4s;
+  }
+  input.cmn-toggle-round-flat:checked + label {
+    background-color: #99001a;
+  }
+  input.cmn-toggle-round-flat:checked + label:after {
+    margin-left: 60px;
+    background-color: #99001a;
   }
 
   </style>
@@ -230,15 +364,48 @@
       </div>
     </div>
 
-    <div id="leaderboard" class="page datagrid noselect">
-      <table>
-        <thead>
-          <th>Username</th>
-          <th>Points</th>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
+    <div id="leaderboard" class="page noselect">
+
+      <div id="period-chooser">
+        <div class="selectedPeriod"><b>Today</b></div>
+        <div>
+          <div class="switch">
+            <input id="cmn-toggle-5" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+            <label for="cmn-toggle-5"></label>
+          </div>
+        </div>
+        <div><b>Overall</b></div>
+      </div>
+
+      <div style="position: relative">
+        <div class="datagrid today">
+          <table>
+            <thead>
+              <th>#</th>
+              <th>Username</th>
+              <th>Points</th>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="datagrid overall">
+          <table>
+            <thead>
+              <th>#</th>
+              <th>Username</th>
+              <th>Days Won</th>
+            </thead>
+            <tbody>
+              <td>1</td>
+              <td>chiefsmurph</td>
+              <td>2</td>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
 
       <div id="tooltip"><h3></h3><span></span></div>
     </div>
@@ -734,6 +901,12 @@
 
                   new loadingSpinner($('#conquer-cities #attackResults'));
 
+                  socket.once('attackError', function(data) {
+                    $('#conquer-cities .step3 button#goForIt').hide();
+                    $('#conquer-cities button.reset').show();
+                    $('#conquer-cities #attackResults').html(data).addClass('red');
+                  });
+
                   socket.once('attackConfirm', function(data) {
                     $('#conquer-cities #attackResults').html('Attack confirmed').addClass('green');
 
@@ -793,10 +966,10 @@
           'top10': [],
 
           renderTop10: function() {
-            var $tbody = $('#leaderboard tbody');
+            var $tbody = $('#leaderboard .today tbody');
             $tbody.empty();
-            this.top10.forEach(function(row) {
-              $tbody.append('<tr><td><span>' + row.username + '</span></td><td>' + row.points + '</td></tr>');
+            this.top10.forEach(function(row, i) {
+              $tbody.append('<tr><td>' + (i + 1) + '</td><td><span>' + row.username + '</span></td><td>' + row.points + '</td></tr>');
             });
 
             $('#leaderboard tbody td:contains(' + app.state.username + ')').parent().css('background-color', 'yellow');
@@ -836,55 +1009,81 @@
             return (found.length) ? found[0].cities : [];
           },
           init: function() {
-            var $ttBox = this.$tooltipbox;
-            $ttBox.hide();
 
-            var getSetAndShowTT = function(username) {
-              var cities = app.pages.leaderboard.getCitiesForUsername(username);
-              app.set({
-                tooltipname: username,
-                tooltipbody: (cities.length) ? cities.join('<br>') : 'No cities'
-              });
-              $ttBox.show();
-            };
+            var $todayTable = $('.datagrid.today');
+            var $overallTable = $('.datagrid.overall')
+            $('#cmn-toggle-5').on('change', function() {
+              var selected = $('.selectedPeriod').index();
+              var other = (selected === 0) ? 2 : 0;
+              if (selected === 0) {
+                $todayTable.stop().fadeOut(500);
+                $overallTable.stop().fadeIn(500);
+                other = 2;
+              } else {
+                $overallTable.stop().fadeOut(500);
+                $todayTable.stop().fadeIn(500);
+                other = 0;
+              }
 
-            if (app.isMobile) {
-              $ttBox.addClass('modal');
-              $ttBox.on('click', function() {
-                $ttBox.hide();
-              });
-              $('#leaderboard table').on('mousedown', 'td span', function() {
+              console.log(selected, other);
+              $('#period-chooser > div').removeClass('selectedPeriod').eq(other).addClass('selectedPeriod');
+            });
+
+            $('#period-chooser').on('click', 'div:not(.selectedPeriod) b', function() {
+              $('#cmn-toggle-5').click();
+            });
+
+            (function setupTooltips($ttBox, top10) {
+
+              $ttBox.hide();
+
+              var getSetAndShowTT = function(username) {
+                var cities = app.pages.leaderboard.getCitiesForUsername(username);
+                app.set({
+                  tooltipname: username,
+                  tooltipbody: (cities.length) ? cities.join('<br>') : 'No cities'
+                });
+                $ttBox.show();
+              };
+
+              if (app.isMobile) {
+                $ttBox.addClass('modal');
+                $ttBox.on('click', function() {
+                  $ttBox.hide();
+                });
+                $('#leaderboard table').on('mousedown', 'td span', function() {
+                  var username = $(this).text();
+                  getSetAndShowTT(username);
+                });
+                $('#leaderboard table').on('mouseup', 'td span', function() {
+                  $ttBox.hide();
+                });
+                return;
+              }
+
+              var lagInHide = false;
+              $('#leaderboard table').on('mouseover', 'td span', function() {
                 var username = $(this).text();
                 getSetAndShowTT(username);
-              });
-              $('#leaderboard table').on('mouseup', 'td span', function() {
-                $ttBox.hide();
-              });
-              return;
-            }
 
-            var top10 = this.top10;
-            var lagInHide = false;
-            $('#leaderboard table').on('mouseover', 'td span', function() {
-              var username = $(this).text();
-              getSetAndShowTT(username);
-
-              $(this).on('mousemove', function(evt) {
-                $ttBox.css({
-                  top: evt.pageY,
-                  left: evt.pageX + 25
+                $(this).on('mousemove', function(evt) {
+                  $ttBox.css({
+                    top: evt.pageY,
+                    left: evt.pageX + 25
+                  });
                 });
+                lagInHide = true;
               });
-              lagInHide = true;
-            });
-            $('#leaderboard table').on('mouseout', 'td span', function(evt) {
-              lagInHide = false;
-              setTimeout(function() {
-                if (!lagInHide) {
-                  $ttBox.hide();
-                }
-              }, 200);
-            });
+              $('#leaderboard table').on('mouseout', 'td span', function(evt) {
+                lagInHide = false;
+                setTimeout(function() {
+                  if (!lagInHide) {
+                    $ttBox.hide();
+                  }
+                }, 200);
+              });
+            })(this.$tooltipbox, this.top10);
+
 
           }
         }
