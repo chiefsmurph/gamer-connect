@@ -31,7 +31,7 @@
     font-family: 'Audiowide', cursive;
   }
   html, body {
-    overflow-x:hidden;
+    overflow: hidden;
     padding: 0;
     margin: 0;
   }
@@ -41,7 +41,11 @@
   #nav {
     display: flex;
     justify-content: space-around;
-    margin: 0 -10px 10px;
+    margin: 0 0 10px;
+  }
+  .page {
+    margin: 0 4px;
+    overflow-y: scroll;
   }
   #nav a {
     background-color: #eee;
@@ -651,7 +655,7 @@
         $(window).on(
           'touchmove',
            function(e) {
-            // e.preventDefault();
+            e.preventDefault();
           }
         );
 
