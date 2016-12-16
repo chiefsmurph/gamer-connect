@@ -565,16 +565,11 @@
 
             socket.on('top10', function(data) {
               console.log('top10', data);
-              app.cue('leaderboard.setAndRender', data.map(function(row) {
-                return Object.assign({}, row, {
-                  points: app.cue('global.numberWithCommas', row.points)
-                })
-              }));
+              app.cue('leaderboard.setAndRender', data);
             });
 
             socket.on('top10update', function(row) {
               console.log('top10update', row);
-              if (row.points) row.points = app.cue('global.numberWithCommas', row.points);
               app.cue('leaderboard.update', row);
             });
 
@@ -1038,7 +1033,7 @@
             $tbody.empty();
             this.top10.forEach(function(row, i) {
               if (!row.points) { return; }
-              $tbody.append('<tr><td>' + (i + 1) + '</td><td><span>' + row.username + '</span></td><td>' + row.points + '</td></tr>');
+              $tbody.append('<tr><td>' + (i + 1) + '</td><td><span>' + row.username + '</span></td><td>' + app.cue('global.numberWithCommas', row.points) + '</td></tr>');
             });
 
             $('#leaderboard .today tbody td:contains(' + app.state.username + ')').parent().css('background-color', '#FFD300');
