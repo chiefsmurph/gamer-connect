@@ -15,7 +15,7 @@
     margin: 0;
   }
   #container > h1 {
-    padding: 20px 0 0 6px;
+    padding: 20px;
   }
   h2 {
     margin: 0 0 10px 0;
@@ -141,6 +141,9 @@
   #conquer-cities button {
     margin-top: 10px;
   }
+  #leaderboard {
+    margin: 1vw;
+  }
   #leaderboard table {
     font-size: 220%;
   }
@@ -170,12 +173,20 @@
     margin: 0 -4px;
     position: relative;
   }
+  #leaderboard tr.usersScore {
+    color: red;
+    background-color: ;
+  }
+  #leaderboard tr:hover {
+    color: red;
+    background-color: yellow;
+  }
   .datagrid {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    margin: 0 4px;
+    margin: 4px;
   }
   .datagrid table { border-collapse: collapse; text-align: left; width: 100%; font-size: 80%; } .datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: #fff; overflow: hidden; border: 1px solid #006699; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }.datagrid table td, .datagrid table th { padding: 3px 10px; }.datagrid table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; color:#ffffff; font-weight: bold; border-left: 1px solid #0070A8; } .datagrid table thead th:first-child { border: none; }.datagrid table tbody td { color: #00496B; border-left: 1px solid #E1EEF4;font-weight: normal; }.datagrid table tbody .alt td { background: #E1EEF4; color: #00496B; }.datagrid table tbody td:first-child { border-left: none; }.datagrid table tbody tr:last-child td { border-bottom: none; }.datagrid table tfoot td div { border-top: 1px solid #006699;background: #E1EEF4;} .datagrid table tfoot td { padding: 0; } .datagrid table tfoot td div{ padding: 2px; }.datagrid table tfoot td ul { margin: 0; padding:0; list-style: none; text-align: right; }.datagrid table tfoot  li { display: inline; }.datagrid table tfoot li a { text-decoration: none; display: inline-block;  padding: 2px 8px; margin: 1px;color: #FFFFFF;border: 1px solid #006699;-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; }.datagrid table tfoot ul.active, .datagrid table tfoot ul a:hover { text-decoration: none;border-color: #006699; color: #FFFFFF; background: none; background-color:#00557F;}div.dhtmlx_window_active, div.dhx_modal_cover_dv { position: fixed !important; }
   .overall {
@@ -204,156 +215,75 @@
 
   /*leaderboard switch*/
   #period-chooser {
-  	display: -ms-flexbox;
-  	display: -webkit-flex;
-  	display: flex;
-
-  	-ms-flex-align: center;
-  	-webkit-align-items: center;
-  	-webkit-box-align: center;
-
-  	align-items: center;
-    justify-content: center;
-
-    margin-bottom: 1vh;
-    height: 67px;
-  }
-  #period-chooser > div {
-    flex-basis: 100%;
+    /*margin-bottom: 1vh;*/
+    height: 3em;
+    line-height: 3em;
+    text-align: center;
+    /*background-color: beige;*/
+    border: 3px dashed beige;
+    border-bottom-width: 0;
+    border-radius: 10px 10px 0 0;
   }
   #period-chooser b {
     text-transform: uppercase;
     font-size: calc(1vw + 10px);
   }
+  #period-chooser div:not(.selectedPeriod) b:hover {
+    text-decoration: underline;
+  }
+  #period-chooser > div {
+    display: inline-block;
+    width: 45%;
+    /*background-color: beige;*/
+    /*height: 100%;*/
+  }
   .no-touch #period-chooser b {
-    -webkit-transition: font-size 1s;
-       -moz-transition: font-size 1s;
-         -o-transition: font-size 1s;
-            transition: font-size 1s;
+    -webkit-transition: font-size 0.5s;
+       -moz-transition: font-size 0.5s;
+         -o-transition: font-size 0.5s;
+            transition: font-size 0.5s;
             color: grey;
   }
   #period-chooser .selectedPeriod b {
     font-size: calc(2vw + 15px);
     color: black;
   }
-  #period-chooser > div:nth-child(1) {
-    padding-right: 2.5vw;
-    text-align: right;
-  }
-  #period-chooser > div:nth-child(2) {
-    flex-basis: 33%;
-    padding-left: 0px;
-    width: 150px;
-  }
   #period-chooser > div:not(.selectedPeriod) b {
     cursor: pointer;
   }
-  #period-chooser > div:nth-child(3) {
-    padding-left: 2.5vw;
+  #period-chooser > div:nth-child(1) {
+    text-align: right;
+    padding-right: 1vw;
   }
-  .cmn-toggle {
-    position: absolute;
-    margin-left: -9999px;
-    cursor: pointer;
-    visibility: hidden;
-  }
-  @media (max-width: 800px) {
-    body:not(.no-touch) #container > h1 {
-      text-align: center;
-    }
-    body:not(.no-touch) .datagrid {
-      font-size: 2vw;
-    }
-    body:not(.no-touch) #period-chooser {
-      margin-left: -20px;
-    }
-    #period-chooser .switch {
-      zoom: 50%;
-    }
-    body:not(.no-touch) .datagrid th {
-      font-size: 60%;
-    }
-    body:not(.no-touch) #period-chooser > div:nth-child(3) {
-      padding-left: 15px;
-    }
-    period-chooser > div:nth-child(1) {
-      margin-left: -10px;
-    }
-  }
-  #period-chooser .switch {
-    position: relative;
-  }
-  .cmn-toggle + label {
-    display: block;
-    position: relative;
-    cursor: pointer;
-    outline: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    cursor: pointer;
-  }
-  input.cmn-toggle-round-flat + label {
-    padding: 2px;
-    width: 120px;
-    height: 60px;
-    background-color: #006699;
-    -webkit-border-radius: 60px;
-    -moz-border-radius: 60px;
-    -ms-border-radius: 60px;
-    -o-border-radius: 60px;
-    border-radius: 60px;
-    -webkit-transition: background 0.4s;
-    -moz-transition: background 0.4s;
-    -o-transition: background 0.4s;
-    transition: background 0.4s;
-  }
-  input.cmn-toggle-round-flat + label:before, input.cmn-toggle-round-flat + label:after {
-    display: block;
-    position: absolute;
-    content: "";
-  }
-  input.cmn-toggle-round-flat + label:before {
-    top: 2px;
-    left: 2px;
-    bottom: 2px;
-    right: 2px;
-    background-color: #fff;
-    -webkit-border-radius: 60px;
-    -moz-border-radius: 60px;
-    -ms-border-radius: 60px;
-    -o-border-radius: 60px;
-    border-radius: 60px;
-    -webkit-transition: background 0.4s;
-    -moz-transition: background 0.4s;
-    -o-transition: background 0.4s;
-    transition: background 0.4s;
-  }
-  input.cmn-toggle-round-flat + label:after {
-    top: 4px;
-    left: 4px;
-    bottom: 4px;
-    width: 52px;
-    background-color: #006699;
-    -webkit-border-radius: 52px;
-    -moz-border-radius: 52px;
-    -ms-border-radius: 52px;
-    -o-border-radius: 52px;
-    border-radius: 52px;
-    -webkit-transition: margin 0.4s, background 0.4s;
-    -moz-transition: margin 0.4s, background 0.4s;
-    -o-transition: margin 0.4s, background 0.4s;
-    transition: margin 0.4s, background 0.4s;
-  }
-  input.cmn-toggle-round-flat:checked + label {
-    background-color: #99001a;
-  }
-  input.cmn-toggle-round-flat:checked + label:after {
-    margin-left: 60px;
-    background-color: #99001a;
+  #period-chooser > div:nth-child(2) {
+    text-align: left;
+    padding-left: 1vw;
   }
 
+
+  #sidebar {
+    float: right;
+    font-size: 70%;
+    padding: 1em;
+    border: 2px dashed grey;
+    border-width: 0 0 1px 1px;
+  }
+
+  @media (max-width: 600px) {
+    #container > h1 {
+      text-align: center;
+    }
+    #your-portal {
+      font-size: 120%;
+    }
+    #sidebar {
+      position: absolute;
+      bottom: 0;
+      clear: both;
+      float: none;
+      border-width: 1px 0 0 1px;
+    }
+  }
   </style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href='https://fonts.googleapis.com/css?family=Audiowide' rel='stylesheet' type='text/css'>
@@ -390,11 +320,18 @@
     </div>
 
     <div id="your-portal" class="page">
-      <h2>Welcome <span class='username'></span></h2>
-      Your score: <span id="myPoints"></span>
-      <div id="your-cities">
-        Your cities:
-        <ul></ul>
+      <div style="float: left">
+        <h2>Welcome <span class='username'></span></h2>
+        Your score: <span id="myPoints"></span>
+        <div id="your-cities">
+          Your cities:
+          <ul></ul>
+        </div>
+      </div>
+      <div id="sidebar">
+        Attacks left today: <span id="attacks-left">3</span><br>
+        Time until end of day: 3434343 seconds<br>
+        Time until end of week: 424 seconds
       </div>
     </div>
 
@@ -418,12 +355,6 @@
 
       <div id="period-chooser">
         <div class="selectedPeriod"><b>Today</b></div>
-        <div>
-          <div class="switch">
-            <input id="cmn-toggle-5" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
-            <label for="cmn-toggle-5"></label>
-          </div>
-        </div>
         <div><b>Overall</b></div>
       </div>
 
@@ -445,7 +376,7 @@
             <thead>
               <th>#</th>
               <th>Username</th>
-              <th>Days Won</th>
+              <th>Days</th>
             </thead>
             <tbody>
               <td>1</td>
@@ -479,6 +410,15 @@
     <h1>Congrats!</h1>
     <h2>You were able to steal leadership of <span class="attackingCityName"></span> from <span class="attackingName"></span></h2>
   </div>
+
+  <div class="modal" id="newDay">
+    <h2>NEW DAY</h2>
+  </div>
+
+  <div class="modal" id="newWeek">
+    <h2>NEW WEEK</h2>
+  </div>
+
 
   <div class="modal" id="dethroned">
     <h2>You have been dethroned of <span id="dethronedCity"></span> by <span id="dethronedBy"></span></h2>
@@ -558,6 +498,9 @@
         cities: []
       },
       global: {
+        numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        },
         renderNavMenu: function() {
           $('#nav').empty();
           var renderSingle = function(pageName) {
@@ -567,27 +510,75 @@
           var pagesToRender = (!app.state.isLoggedIn) ? ['home', 'signup'] : ['home', 'your-portal', 'conquer-cities', 'leaderboard'];
           pagesToRender.forEach(renderSingle);
         },
+        setPoints: function(data) {
+          app.set({ points: app.cue('global.numberWithCommas', data) });
+        },
         becomeLoggedIn: function() {
+
+          (function timeSchedules() {
+
+            var clearEverything = function() {
+              app.cue('global.setPoints', 0);
+              app.cue('leaderboard.resetToAllTo0');
+              app.set({ attacksLeft: 3 });
+
+              app.cue('conquer-cities.reset');
+              app.forceReinit('conquer-cities');
+              app.navigate.goTo('your-portal');
+            };
+
+            socket.on('newWeek', function() {
+              console.log('new week')
+
+              $('#newWeek').show();
+              setTimeout(function() {
+                $('#newWeek').fadeOut('slow', function() {
+                  app.cue('your-portal.updateCurrentCities', []);
+                  clearEverything();
+                });
+              }, 3500);
+            });
+
+            socket.on('newDay', function() {
+              console.log('new day');
+
+              $('#newDay').show();
+              setTimeout(function() {
+                $('#newDay').fadeOut('slow', clearEverything);
+              }, 3500);
+            });
+
+          })();
+
 
           app.set({ isLoggedIn: true });
           app.cue('global.renderNavMenu');
 
           socket.on('pointsUpdate', function(data) {
             console.log('updated points', data);
-            app.set({ points: data });
+            app.cue('global.setPoints', data);
           });
 
-          socket.emit('getfullleaderboard');
+          (function leaderboardStuff() {
 
-          socket.on('top10', function(data) {
-            console.log('top10', data);
-            app.cue('leaderboard.setAndRender', data);
-          });
+            socket.emit('getfullleaderboard');
 
-          socket.on('top10update', function(row) {
-            console.log('top10update', row);
-            app.cue('leaderboard.update', row);
-          });
+            socket.on('top10', function(data) {
+              console.log('top10', data);
+              app.cue('leaderboard.setAndRender', data.map(function(row) {
+                return Object.assign({}, row, {
+                  points: app.cue('global.numberWithCommas', row.points)
+                })
+              }));
+            });
+
+            socket.on('top10update', function(row) {
+              console.log('top10update', row);
+              if (row.points) row.points = app.cue('global.numberWithCommas', row.points);
+              app.cue('leaderboard.update', row);
+            });
+
+          })();
 
           // sending attack response
           var attackResponse = function(response) {
@@ -717,7 +708,9 @@
                 window.location.reload(false);
               }, 1000);
             }
-            app.set(Object.assign({}, savedInfo, response));
+            app.set(Object.assign({}, savedInfo, response, {
+              points: app.cue('global.numberWithCommas', response.points)
+            }));
             app.cue('your-portal.updateCurrentCities', response.cities);
             console.log(app.state);
             app.cue('global.becomeLoggedIn');
@@ -756,6 +749,8 @@
             response.activeAttacksIncoming.forEach(function(attack) {
               app.cue('global.beingAttacked', attack);
             });
+
+            app.cue('leaderboard.setOverall', response.overallLeaderboard);
           });
 
         } else {
@@ -807,8 +802,8 @@
 
             var $username = this.$username;
             $username.focus();
-            $('#join').one('click', function() {
-
+            $('#join').off().on('click', function(evt) {
+              evt.preventDefault();
               var loading = new loadingSpinner($('#createUserFeedback'));
 
               var username = $username.val();
@@ -849,6 +844,10 @@
             username: {
               el: '.username',
               map: 'username'
+            },
+            attacksLeft: {
+              el: '#attacks-left',
+              map: 'attacksLeft'
             }
           },
           init: function() {
@@ -861,7 +860,7 @@
             $('#your-cities ul').html(cities.map(function(city) {
               return '<li>' + city + '</li>';
             }));
-          }
+          },
         },
         'conquer-cities': {
           protected: true,
@@ -916,20 +915,24 @@
                   $('#conquer-cities .step3 #attackQ').text('Would you like to become leader of the city?');
                   $('#conquer-cities .step3 button#goForIt').data('conquer-type', 'usurp');
                 } else if (leader === app.state.username) {
-                  $('#conquer-cities .step3 #attackQ').text('You are already the leader of this city.  Go off and conquer more cities.');
+                  $('#conquer-cities .step3 #attackQ').text('You are already the leader of this city.  Go off and conquer more cities.').addClass('green');
                   $('#conquer-cities .step2 #curLeader').text(leader);
-                  $('#conquer-cities .step3 #attackQ').addClass('green');
+                  $('#conquer-cities .step3 button#goForIt').hide();
+                  $('#conquer-cities button.reset').show();
+                } else if (app.state.attacksLeft === 0) {
+                  $('#conquer-cities .step3 #attackQ').text('You are out of attacks for the day.  Go and conquer other lands or wait till tomorrow to get your revenge.').addClass('red');
+                  $('#conquer-cities .step2 #curLeader').text(leader);
                   $('#conquer-cities .step3 button#goForIt').hide();
                   $('#conquer-cities button.reset').show();
                 } else {
                   $('#conquer-cities .step2 #curLeader').text(leader);
                   $('#conquer-cities .step3 #attackQ').text('Would you like to try to take over the city in a coup?');
-                  $('#conquer-cities .step3 button#goForIt').text('Click here to attack the leadership of ' + leader);
-                  $('#conquer-cities .step3 button#goForIt').data('conquer-type', 'attack');
+                  $('#conquer-cities .step3 button#goForIt').text('Click here to attack the leadership of ' + leader).data('conquer-type', 'attack');
                 }
               });
 
-              $('#conquer-cities .step3 button#goForIt').one('click', function() {
+              $('#conquer-cities .step3 button#goForIt').off().on('click', function(evt) {
+                evt.preventDefault();
                 if ($(this).data('conquer-type') === 'usurp') {
                   console.log('conqieruing')
                   socket.emit('conquerCity', app.state.nearestCity);
@@ -954,6 +957,10 @@
                     }, 2000);
                   });
                 } else {
+
+                  app.set({
+                    attacksLeft: app.state.attacksLeft - 1
+                  });
 
                   socket.emit('attackCity', {
                     city: app.state.nearestCity,
@@ -1030,10 +1037,11 @@
             var $tbody = $('#leaderboard .today tbody');
             $tbody.empty();
             this.top10.forEach(function(row, i) {
+              if (!row.points) { return; }
               $tbody.append('<tr><td>' + (i + 1) + '</td><td><span>' + row.username + '</span></td><td>' + row.points + '</td></tr>');
             });
 
-            $('#leaderboard .today tbody td:contains(' + app.state.username + ')').parent().css('background-color', 'yellow');
+            $('#leaderboard .today tbody td:contains(' + app.state.username + ')').parent().css('background-color', '#FFD300');
             console.log('here');
 
             var maxTableHeight = this.top10.length * 40 + 50;
@@ -1045,6 +1053,14 @@
             //   console.log('there')
             // }, 1000);
 
+          },
+
+          resetToAllTo0: function() {
+            this.top10 = this.top10.map(function(row) {
+              row.points = 0;
+              return row;
+            });
+            this.renderTop10();
           },
 
           setAndRender: function(data) {
@@ -1065,7 +1081,7 @@
             })();
             if (index === -1) {
               this.top10.push(row);
-              return console.log('new user to the leaderboard');
+              console.log('new user to the leaderboard');
             }
             this.top10[index] = Object.assign({}, this.top10[index], row);
             this.top10.sort(function(a, b) {
@@ -1080,10 +1096,38 @@
             });
             return (found.length) ? found[0].cities : [];
           },
+          setOverall: function(data) {
+            var $tbody = $('#leaderboard .overall tbody');
+            $tbody.empty();
+            data.forEach(function(row, i) {
+              if (!row.points) { return; }
+              $tbody.append('<tr><td>' + (i + 1) + '</td><td><span>' + row.username + '</span></td><td>' + row.dayswon + '</td></tr>');
+            });
+          },
           init: function() {
+
+            socket.on('overallLeaderboard', function(data) {
+              app.cue('leaderboard.setOverall', data);
+            });
 
             var $todayTable = $('.datagrid.today');
             var $overallTable = $('.datagrid.overall')
+
+            $('#period-chooser > div').on('click', function() {
+              if ($(this).hasClass('selectedPeriod')) { return; }
+              var selected = $('.selectedPeriod').index();
+              if (selected === 0) {
+                $todayTable.stop().fadeOut(500);
+                $overallTable.stop().fadeIn(500);
+                other = 1;
+              } else {
+                $overallTable.stop().fadeOut(500);
+                $todayTable.stop().fadeIn(500);
+                other = 0;
+              }
+              $('#period-chooser > div').removeClass('selectedPeriod').eq(other).addClass('selectedPeriod');
+            });
+
             $('#cmn-toggle-5').on('change', function() {
               var selected = $('.selectedPeriod').index();
               var other = (selected === 0) ? 2 : 0;
@@ -1123,19 +1167,19 @@
                 $ttBox.on('click', function() {
                   $ttBox.hide();
                 });
-                $('#leaderboard table').on('mousedown', 'td span', function() {
-                  var username = $(this).text();
+                $('#leaderboard table tbody').on('mousedown', 'tr', function() {
+                  var username = $(this).find('td span').text();
                   getSetAndShowTT(username);
                 });
-                $('#leaderboard table').on('mouseup', 'td span', function() {
+                $('#leaderboard table tbody').on('mouseup', 'tr', function() {
                   $ttBox.hide();
                 });
                 return;
               }
 
               var lagInHide = false;
-              $('#leaderboard table').on('mouseover', 'td span', function() {
-                var username = $(this).text();
+              $('#leaderboard table tbody').on('mouseover', 'tr', function() {
+                var username = $(this).find('td span').text();
                 getSetAndShowTT(username);
 
                 $(this).on('mousemove', function(evt) {
@@ -1146,7 +1190,7 @@
                 });
                 lagInHide = true;
               });
-              $('#leaderboard table').on('mouseout', 'td span', function(evt) {
+              $('#leaderboard table tbody').on('mouseout', 'tr', function(evt) {
                 lagInHide = false;
                 setTimeout(function() {
                   if (!lagInHide) {

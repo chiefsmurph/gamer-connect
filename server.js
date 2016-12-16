@@ -295,12 +295,14 @@ function SQL(tableName, fieldObj) {
   };
   this.update = function(options) {
     var parts = ['UPDATE', this.tableName, 'SET'];
-    if (!options || !options.data || !options.where) {
-      return console.error('SQL.update needs both options.data and options.where');
+    if (!options || !options.data) {
+      return console.error('SQL.update needs options.data');
     }
     parts.push(delimitedVals(options.data, ', '));
-    parts.push('WHERE');
-    parts.push(delimitedVals(options.where, ' AND '));
+    if (options.where) {
+      parts.push('WHERE');
+      parts.push(delimitedVals(options.where, ' AND '));
+    }
     if (options.extra) {
       parts.push(options.extra);
     }
@@ -514,6 +516,7 @@ var CityPeople = new TableInterface(pg, process.env.DATABASE_URL + "?ssl=true", 
   hashcode: ['varchar(70)', 'not null'],
   joinDate: ['timestamp', 'without time zone default (now() at time zone \'utc\')'],
   points: ['integer', 'default 0'],
+  dayswon: ['integer', 'default 0'],
   isbanned: ['boolean', 'default false'],
   lat: ['float', 'not null'],
   long: ['float', 'not null'],
@@ -579,7 +582,7 @@ var CityPeople = new TableInterface(pg, process.env.DATABASE_URL + "?ssl=true", 
 
 
 //
-const cities = require("all-the-cities");
+// const cities = require("all-the-cities");
 //console.log(cities)
 
 //
@@ -703,10 +706,10 @@ io.sockets.on('connection', function (socket) {
     //console.log(JSON.stringify(user));
     if (data.lat != user.lat && data.long != user.long) {
       return socket.emit('SUCK it HACKz0r');
-    } else if (!(data.username.length > 3 && data.username.length < 14)) {
-        return socket.emit('createUserError', 'Username must be between 3 & 14 characters in length');
+    } else if (!(data.username.length >= 3 && data.username.length <= 14)) {
+      return socket.emit('createUserError', 'Username must be between 3 & 14 characters in length');
     } else if (checkForBadWords(data.username)) {
-        return socket.emit('createUserError', 'Don\'t be a dumbass.  No swearing allowed in your username');
+      return socket.emit('createUserError', 'Don\'t be a dumbass.  No swearing.');
     }
     CityPeople.checkUsernameAvailable(data.username, function(available) {
       console.log('av', available);
@@ -741,7 +744,8 @@ io.sockets.on('connection', function (socket) {
         user = Object.assign({}, response, {
           loggedIn: true
         });
-        //console.log(JSON.stringify(response) + 'res');
+
+        console.log('user ', JSON.stringify(user));
         socket.emit('userResponse', Object.assign({}, {
           points: response.points,
           cities: cities
@@ -778,10 +782,8 @@ io.sockets.on('connection', function (socket) {
         console.log('aready found', response);
         return socket.emit('conquerResponse', null);
       }
-      LandClaims.claimLand(cityObj.cityid, cityObj.cityname, user.username, user.playerid, function(response) {
-        if (response) {
-          pointsManager.registerNewLeader(response.claimid, cityObj, user.playerid);
-        }
+      pointsManager.registerNewLeader(cityObj, user.playerid, user.username, function(response) {
+        if (!response) { return socket.emit('conquerResponse', null); }
         return socket.emit('conquerResponse', response);
       });
     });
@@ -829,11 +831,14 @@ io.sockets.on('connection', function (socket) {
 
 var pointsManager = (function() {
   var playerDb = {};
+  var citiesTaken = [];
   var activeAttacks = {};
 
   return {
     leaderboard: (function() {
       var forTheDay = [];
+      var overall = [];
+
       return {
         getPositionOfPlayer: function(playerid) {
           var index = (function getRelatedIndex() {
@@ -903,6 +908,23 @@ var pointsManager = (function() {
             return player.points > 0;
           });
         },
+        refreshOverallLeaderboard: function() {
+          overall = Object.keys(playerDb).map(function(id) {
+            return {
+              playerid: Number(id),
+              dayswon: playerDb[id].dayswon,
+              username: playerDb[id].username
+            };
+          }).filter(function(player) {
+            return player.dayswon;
+          }).sort(function(a, b) {
+            return b.dayswon - a.dayswon;
+          });
+          return overall;
+        },
+        getOverall: function() {
+          return overall;
+        },
         getTop10: function() {
           return forTheDay.slice(0, 10);
         },
@@ -914,6 +936,9 @@ var pointsManager = (function() {
                 cities: playerDb[player.playerid].cities
               });
             });
+        },
+        getCurrentWinner: function() {
+          return forTheDay[0];
         }
       }
     })(),
@@ -945,38 +970,84 @@ var pointsManager = (function() {
       });
     },
     init: function() {
-      console.log('initting')
+      console.log('initting');
+
+      // clear all pointIncrease interval
+      Object.keys(playerDb).forEach(function(playerid) {
+        var player = playerDb[playerid];
+        console.log('deleting player ' + player.username);
+        if (!player.timeouts) { return; }
+        player.timeouts.forEach(function(timeoutObj) {
+          console.log('stopping point increase for ' + player.username);
+          clearInterval(timeoutObj.timeout);
+        });
+      });
+
+      // clear out any past activeAttacks timeouts
+      Object.keys(activeAttacks).forEach(function(attackid) {
+        console.log('deleting attack ' + attackid);
+        var attack = activeAttacks[attackid];
+        clearTimeout(attack.timeout);
+        activeAttacks[attackid] = null;
+        delete activeAttacks[attackid];
+      });
+
       CityPeople.getAllPlayers(function(players) {
         console.log('all players: ');
         console.log(JSON.stringify(players, null, 2));
         // need playerid and points, username
         if (!players) return;
         players.forEach(function(player) {
-          playerDb[player.playerid] = {};
+          playerDb[player.playerid] = playerDb[player.playerid] || {};
+          playerDb[player.playerid].dayswon = player.dayswon;
           playerDb[player.playerid].points = player.points;
           playerDb[player.playerid].username = player.username;
+          playerDb[player.playerid].attacksLeft = 3;
           playerDb[player.playerid].cities = [];
+          playerDb[player.playerid].dayswon = [];
         });
 
+        citiesTaken = [];
         LandClaims.getAllLandClaims(function(claims) {
           console.log(claims);
           claims.forEach(function(claim) {
             pointsManager.addScoreIncrease(claim.claimid, claim.cityid, claim.leaderid);
             playerDb[claim.leaderid].cities.push(claim.cityname);
+            citiesTaken.push(claim.cityid);
           });
 
           pointsManager.leaderboard.refreshLeaderboard();
+          pointsManager.leaderboard.refreshOverallLeaderboard();
 
         });
 
       });
+    },
+    incrementDaysWon: function(playerid, cb) {
+      console.log('updating database with dayswon ...')
+      CityPeople.update({
+        data: {
+          dayswon: dayswon + 1
+        },
+        where: {
+          playerid: playerid
+        }
+      }, function() {
+        console.log('updating playerdb...')
+        playerDb[playerid].dayswon = (playerDb[playerid].dayswon) ? playerDb[playerid].dayswon + 1 : 1;
+        console.log('refreshing overall leaderboard');
+        io.sockets.emit('overallLeaderboard', pointsManager.leaderboard.refreshOverallLeaderboard());
+        if (cb) cb();
+      });
+
     },
     registerNewPlayer: function(playerid, username, socket) {
       playerDb[playerid] = {
         username: username,
         socket: socket,
         cities: [],
-        points: 0
+        points: 0,
+        attacksLeft: 3
       };
     },
     loginUser: function(playerid, socket) {
@@ -1004,14 +1075,24 @@ var pointsManager = (function() {
             attacking: playerDb[activeAttacks[attackid].attacking].username,
             cityname: activeAttacks[attackid].cityObj.cityname
           };
-        })
+        }),
+        overallLeaderboard: pointsManager.leaderboard.getOverall(),
+        attacksLeft: playerDb[playerid].attacksLeft
       };
     },
-    registerNewLeader(claimid, cityObj, playerid) {
+    registerNewLeader(cityObj, playerid, username, cb) {
       console.log('registering new leader ', cityObj.cityname, playerid);
-      // when land_claims db has been updated and there was no previous leader
-      this.addToCitiesAndUpdate(playerid, cityObj.cityname);
-      this.addScoreIncrease(claimid, cityObj.cityid, playerid);
+
+      if (!username || !playerid || !cityObj) { return cb(null); }
+      if (citiesTaken.indexOf(cityObj.cityid) !== -1) { return cb(null); }
+      LandClaims.claimLand(cityObj.cityid, cityObj.cityname, username, playerid, function(response) {
+        // when land_claims db has been updated and there was no previous leader
+        pointsManager.addToCitiesAndUpdate(playerid, cityObj.cityname);
+        pointsManager.addScoreIncrease(response.claimid, cityObj.cityid, playerid);
+        citiesTaken.push(cityObj.cityid);
+        cb({ cityname: cityObj.cityname });
+      });
+
     },
     handleDisconnect: function(playerid) {
       if (playerDb[playerid]) playerDb[playerid].socket = null;
@@ -1029,6 +1110,11 @@ var pointsManager = (function() {
         // someone already attacking this user
         return null;
       }
+
+      if (playerDb[playerid].attacksLeft === 0) {
+        return null;
+      }
+      playerDb[playerid].attacksLeft--;
 
       var attackid = uuid.v1();
       activeAttacks[attackid] = {
@@ -1134,3 +1220,93 @@ var pointsManager = (function() {
 })();
 
 pointsManager.init();
+
+
+//
+var async = require('async');
+var CronJob = require('cron').CronJob;
+(function scheduler() {
+
+  var endOfDay = function() {
+    // reset scores to 0 in pointsmanager and db
+
+    console.log('running endOfDay', Date.now());
+
+    async.waterfall([
+      function(cb) {
+        console.log('working out the winner of the day...')
+        var winner = pointsManager.leaderboard.getCurrentWinner();
+        console.log('winner: ' + winner.username + ', id: ' + winner.playerid);
+
+        pointsManager.incrementDaysWon(winner.playerid, function() {
+          console.log('done incrementing dayswon')
+          cb();
+        });
+      },
+      function(cb) {
+        console.log('now resetting points to 0')
+        CityPeople.update({
+          data: {
+            points: 0
+          }
+        }, function() {
+          console.log('done with that')
+          cb();
+        });
+      },
+      function(cb) {
+        console.log('reinniting pointsmanager and notifying connected clients')
+        pointsManager.init();
+        io.sockets.emit('newDay');
+      }
+    ]);
+
+  };
+
+  var endOfWeek = function() {
+    // set all landclaims to inactive, notify pointsmanager
+
+    console.log('running endOfWeek', Date.now());
+    async.waterfall([
+      function(cb) {
+        CityPeople.update({
+          data: {
+            points: 0
+          }
+        }, function() {
+          console.log('done with that')
+          cb();
+        });
+      },
+      function(cb) {
+        console.log('making all land claims inactive')
+        LandClaims.update({
+          data: {
+            isactive: false
+          }
+        }, function() {
+          console.log('done')
+          cb();
+        });
+      }, function(cb) {
+        console.log('reinitting pointsmanager and notifying clients of newweek')
+        pointsManager.init();
+        io.sockets.emit('newWeek');
+      }
+    ]);
+
+  };
+
+  [{
+    // every night at 12:00am
+    pattern: '0 0 0 0 * *',
+    fn: endOfDay
+  }, {
+    // every sunday night / monday morning 12:03am
+    pattern: '0 3 0 * * 1',
+    fn: endOfWeek
+  }].forEach(function(toTakePlace) {
+    new CronJob(toTakePlace.pattern, toTakePlace.fn, null, true, "America/New_York");
+  });
+
+})();
