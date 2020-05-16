@@ -145,7 +145,7 @@ io.sockets.on('connection', function (socket) {
 //
 //     var handshake = uuid.v1();
 //
-//     pg.connect(process.env.DATABASE_URL + "?ssl=true", function(err, client, done) {
+//     pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 //       var queryText = 'INSERT INTO city_people (username, hashcode, lat, long, nearestCity) VALUES($1, $2, $3, $4, $5) RETURNING *';
 //       client.query(queryText, [username, handshake, lat, long, nearestCity], function(err, result) {
 //
@@ -217,7 +217,7 @@ io.sockets.on('connection', function (socket) {
 //   },
 //   claimLand: function(cityid, cityname, username, userid, callback) {
 //     //console.log(cityid, cityname, username, userid, lat, long);
-//     pg.connect(process.env.DATABASE_URL + "?ssl=true", function(err, client, done) {
+//     pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 //       var queryText = 'INSERT INTO land_claims (cityid, cityname, leadername, leaderid) VALUES($1, $2, $3, $4) RETURNING *';
 //       client.query(queryText, [cityid, cityname, username, userid], function(err, result) {
 //
@@ -331,6 +331,7 @@ function TableInterface(pg, databaseUrl, tableName, fieldObj, methods) {
     var args = Array.prototype.slice.call(arguments);
     var callback = (typeof args[args.length - 1] === 'function') ? args.pop() : function() {};
     pg.connect(databaseUrl, function(err, client, done) {
+      if (err) return console.error(err);
       var query = client.query.apply(client, args.concat([function(err, result) {
         done();
         if (err) {
@@ -383,7 +384,7 @@ function TableInterface(pg, databaseUrl, tableName, fieldObj, methods) {
 }
 
 
-var LandClaims = new TableInterface(pg, process.env.DATABASE_URL + "?ssl=true", 'land_claims', {
+var LandClaims = new TableInterface(pg, process.env.DATABASE_URL, 'land_claims', {
   claimid: ['serial', 'primary key'],
   cityid: ['integer', 'not null'],
   cityname: ['varchar(70)', 'not null'],
@@ -468,7 +469,7 @@ var LandClaims = new TableInterface(pg, process.env.DATABASE_URL + "?ssl=true", 
 });
 
 
-var CitiesDistance = new TableInterface(pg, process.env.DATABASE_URL + "?ssl=true", 'cities_distance', {
+var CitiesDistance = new TableInterface(pg, process.env.DATABASE_URL, 'cities_distance', {
   cityid: ['serial', 'primary key'],
   cityname: ['varchar(70)', 'not null'],
   country: ['varchar(70)'],
@@ -510,7 +511,7 @@ var CitiesDistance = new TableInterface(pg, process.env.DATABASE_URL + "?ssl=tru
 //CREATE TABLE city_people (playerId serial primary key, username VARCHAR(70) not null, hashcode VARCHAR(70) not null, joinDate timestamp without time zone default (now() at time zone 'utc'), points integer default 0, isBanned boolean default false, lat float not null, long float not null, nearestCity varchar(70) not null)
 
 
-var CityPeople = new TableInterface(pg, process.env.DATABASE_URL + "?ssl=true", 'city_people', {
+var CityPeople = new TableInterface(pg, process.env.DATABASE_URL, 'city_people', {
   playerid: ['serial', 'primary key'],
   username: ['varchar(70)', 'not null'],
   hashcode: ['varchar(70)', 'not null'],
@@ -1297,16 +1298,17 @@ var CronJob = require('cron').CronJob;
 
   };
 
-  [{
-    // every night at 12:00am
-    pattern: '0 0 0 0 * *',
-    fn: endOfDay
-  }, {
-    // every sunday night / monday morning 12:03am
-    pattern: '0 3 0 * * 1',
-    fn: endOfWeek
-  }].forEach(function(toTakePlace) {
-    new CronJob(toTakePlace.pattern, toTakePlace.fn, null, true, "America/New_York");
-  });
+  // [{
+  //   // every night at 12:00am
+  //   pattern: '0 0 0 0 * *',
+  //   fn: endOfDay
+  // }, {
+  //   // every sunday night / monday morning 12:03am
+  //   pattern: '0 3 0 * * 1',
+  //   fn: endOfWeek
+  // }].forEach(function(toTakePlace) {
+  //   console.log({ toTakePlace })
+  //   new CronJob(toTakePlace.pattern, toTakePlace.fn, null, true, "America/New_York");
+  // });
 
 })();
