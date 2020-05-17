@@ -451,6 +451,7 @@
       getCurrentCity: function(callback) {
 
         navigator.geolocation.getCurrentPosition(function sendPosition(position) {
+          console.log({ position })
           //$('#located_at').html("Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude);
           var locObj = {
             lat: position.coords.latitude,
@@ -485,7 +486,7 @@
       }
     };
 
-    var socket = io.connect(`https://chiefsmurph.com`, { secure: true, path: '/gamerconnect' });
+    var socket = io.connect(`https://chiefsmurph.com`, { secure: true, path: '/gamerconnect', transports: ['websocket'] });
     var app = johnsFramework({
       isMobile: (function() {
         var check = false;
