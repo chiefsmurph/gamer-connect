@@ -2,12 +2,22 @@ console.log('DB URL!!! ' + process.env.DATABASE_URL + '?ssl=true');
 
 var uuid = require('uuid');
 var pg = require('pg');
+var fs = require('fs');
 var express = require('express');
 var app = express();
-var server = require('http').Server(app);
+
+
+var options = {
+  key: fs.readFileSync('./nginx-selfsigned.key'),
+  cert: fs.readFileSync('./nginx-selfsigned.crt')
+};
+
+const server = require('https').Server(app, options)
+
+
 var io = require('socket.io')(server);
 
-var port = process.env.PORT || 5000; // Use the port that Heroku
+var port = process.env.PORT || 443; // Use the port that Heroku
 server.listen(port);
 
 console.log('listening on ' + port);
