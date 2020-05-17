@@ -601,30 +601,30 @@ const cities = require("all-the-cities");
 console.log(cities)
 
 
-var converter = require('json-2-csv');
+// var converter = require('json-2-csv');
 
-var options = {
-    delimiter : {
-        wrap  : '"', // Double Quote (") character
-        field : ',', // Comma field delimiter
-        array : ';', // Semicolon array value delimiter
-        eol   : '\n' // Newline delimiter
-    },
-    prependHeader    : true,
-    sortHeader       : false,
-    trimHeaderValues : true,
-    trimFieldValues  :  true,
-    keys             : ['name', 'country', 'adminCode', 'population', 'lat', 'lon']
-};
+// var options = {
+//     delimiter : {
+//         wrap  : '"', // Double Quote (") character
+//         field : ',', // Comma field delimiter
+//         array : ';', // Semicolon array value delimiter
+//         eol   : '\n' // Newline delimiter
+//     },
+//     prependHeader    : true,
+//     sortHeader       : false,
+//     trimHeaderValues : true,
+//     trimFieldValues  :  true,
+//     keys             : ['name', 'country', 'adminCode', 'population', 'lat', 'lon']
+// };
 
-var documents = cities;
+// var documents = cities;
 
-var json2csvCallback = function (err, csv) {
-    if (err) throw err;
-    console.log(csv);
-};
+// var json2csvCallback = function (err, csv) {
+//     if (err) throw err;
+//     console.log(csv);
+// };
 
-converter.json2csv(documents, json2csvCallback, options);
+// converter.json2csv(documents, json2csvCallback, options);
 
 
 
