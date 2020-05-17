@@ -631,41 +631,41 @@ console.log(cities)
 
 console.log(JSON.stringify(cities, null, 2));
 
-// var i = 0;
-// var async = require('async');
-// async.forEachSeries(cities, (city, cityCallback) => {
-//   CitiesDistance.addNewCity(city.name, city.lat, city.lon, () => {
-//     console.log('woo hoo, its #' + i);
-//     i++;
-//     cityCallback();
-//   });
-// });
+var i = 0;
+var async = require('async');
+async.forEachSeries(cities, (city, cityCallback) => {
+  CitiesDistance.addNewCity(city.name, city.lat, city.lon, () => {
+    console.log('woo hoo, its #' + i);
+    i++;
+    cityCallback();
+  });
+});
 
 
-function Inserts(template, data) {
-    if (!(this instanceof Inserts)) {
-        return new Inserts(template, data);
-    }
-    this._rawDBType = true;
-    this.formatDBType = function () {
-        return data.map(d=>'(' + pgp.as.format(template, d) + ')').join(',');
-    };
-}
+// function Inserts(template, data) {
+//     if (!(this instanceof Inserts)) {
+//         return new Inserts(template, data);
+//     }
+//     this._rawDBType = true;
+//     this.formatDBType = function () {
+//         return data.map(d=>'(' + pgp.as.format(template, d) + ')').join(',');
+//     };
+// }
 
-var pgp = require('pg-promise')();
-var db = pgp(process.env.DATABASE_URL);
+// var pgp = require('pg-promise')();
+// var db = pgp(process.env.DATABASE_URL);
 
-//
+// //
 
-db.none('INSERT INTO cities_distance(cityName, country, adminCode, population, lat, long) VALUES $1', Inserts('${name}, ${country}, ${adminCode}, ${population}, ${lat}, ${lon}', cities))
-    .then(data=> {
-        // OK, all records have been inserted
-        console.log('wahooo', data)
-    })
-    .catch(error=> {
-        // Error, no records inserted
-        console.log('error', error);
-    });
+// db.none('INSERT INTO cities_distance(cityName, country, adminCode, population, lat, long) VALUES $1', Inserts('${name}, ${country}, ${adminCode}, ${population}, ${lat}, ${lon}', cities))
+//     .then(data=> {
+//         // OK, all records have been inserted
+//         console.log('wahooo', data)
+//     })
+//     .catch(error=> {
+//         // Error, no records inserted
+//         console.log('error', error);
+//     });
 
 
 
