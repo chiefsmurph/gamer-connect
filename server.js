@@ -32,10 +32,10 @@ app.use(bodyParser.json())
 
 app.use(express.static(__dirname + '/public'));
 
-app.get('*', function(req, res){
-    res.set('Content-Type', 'text/html')
-        .sendfile(__dirname + '/public/index.html');
-});
+// app.get('*', function(req, res){
+//     res.set('Content-Type', 'text/html')
+//         .sendfile(__dirname + '/public/index.html');
+// });
 
 
 
