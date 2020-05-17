@@ -7,12 +7,12 @@ var express = require('express');
 var app = express();
 
 
-var options = {
-  key: fs.readFileSync('./nginx-selfsigned.key'),
-  cert: fs.readFileSync('./nginx-selfsigned.crt')
-};
+// var options = {
+//   key: fs.readFileSync('./nginx-selfsigned.key'),
+//   cert: fs.readFileSync('./nginx-selfsigned.crt')
+// };
 
-const server = require('https').Server(app, options)
+const server = require('http').Server(app)
 
 
 var io = require('socket.io')(server);
