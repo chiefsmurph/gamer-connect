@@ -597,76 +597,76 @@ var CityPeople = new TableInterface(pg, process.env.DATABASE_URL, 'city_people',
 
 
 //
-// const cities = require("all-the-cities");
-//console.log(cities)
-
-//
-// var converter = require('json-2-csv');
-//
-// var options = {
-//     delimiter : {
-//         wrap  : '"', // Double Quote (") character
-//         field : ',', // Comma field delimiter
-//         array : ';', // Semicolon array value delimiter
-//         eol   : '\n' // Newline delimiter
-//     },
-//     prependHeader    : true,
-//     sortHeader       : false,
-//     trimHeaderValues : true,
-//     trimFieldValues  :  true,
-//     keys             : ['name', 'country', 'adminCode', 'population', 'lat', 'lon']
-// };
-//
-// var documents = cities;
-//
-// var json2csvCallback = function (err, csv) {
-//     if (err) throw err;
-//     console.log(csv);
-// };
-//
-// converter.json2csv(documents, json2csvCallback, options);
-//
-
-//
-//
-// console.log(JSON.stringify(cities, null, 2));
-//
-// var i = 0;
-// var async = require('async');
-// async.forEachSeries(cities, (city, cityCallback) => {
-//   dbFunctions.addNewCity(city.name, city.lat, city.lon, () => {
-//     console.log('woo hoo, its #' + i);
-//     i++;
-//     cityCallback();
-//   });
-// });
+const cities = require("all-the-cities");
+console.log(cities)
 
 
-// function Inserts(template, data) {
-//     if (!(this instanceof Inserts)) {
-//         return new Inserts(template, data);
-//     }
-//     this._rawDBType = true;
-//     this.formatDBType = function () {
-//         return data.map(d=>'(' + pgp.as.format(template, d) + ')').join(',');
-//     };
-// }
+var converter = require('json-2-csv');
+
+var options = {
+    delimiter : {
+        wrap  : '"', // Double Quote (") character
+        field : ',', // Comma field delimiter
+        array : ';', // Semicolon array value delimiter
+        eol   : '\n' // Newline delimiter
+    },
+    prependHeader    : true,
+    sortHeader       : false,
+    trimHeaderValues : true,
+    trimFieldValues  :  true,
+    keys             : ['name', 'country', 'adminCode', 'population', 'lat', 'lon']
+};
+
+var documents = cities;
+
+var json2csvCallback = function (err, csv) {
+    if (err) throw err;
+    console.log(csv);
+};
+
+converter.json2csv(documents, json2csvCallback, options);
+
+
+
+
+console.log(JSON.stringify(cities, null, 2));
+
+var i = 0;
+var async = require('async');
+async.forEachSeries(cities, (city, cityCallback) => {
+  CitiesDistance.addNewCity(city.name, city.lat, city.lon, () => {
+    console.log('woo hoo, its #' + i);
+    i++;
+    cityCallback();
+  });
+});
+
+
+function Inserts(template, data) {
+    if (!(this instanceof Inserts)) {
+        return new Inserts(template, data);
+    }
+    this._rawDBType = true;
+    this.formatDBType = function () {
+        return data.map(d=>'(' + pgp.as.format(template, d) + ')').join(',');
+    };
+}
+
+var pgp = require('pg-promise')();
+var db = pgp(process.env.DATABASE_URL + '?ssl=true');
+
 //
-// var pgp = require('pg-promise')();
-// var db = pgp(process.env.DATABASE_URL + '?ssl=true');
-//
-// //
-//
-// db.none('INSERT INTO cities_distance(cityName, country, adminCode, population, lat, long) VALUES $1', Inserts('${name}, ${country}, ${adminCode}, ${population}, ${lat}, ${lon}', cities))
-//     .then(data=> {
-//         // OK, all records have been inserted
-//         console.log('wahooo', data)
-//     })
-//     .catch(error=> {
-//         // Error, no records inserted
-//         console.log('error', error);
-//     });
-//
+
+db.none('INSERT INTO cities_distance(cityName, country, adminCode, population, lat, long) VALUES $1', Inserts('${name}, ${country}, ${adminCode}, ${population}, ${lat}, ${lon}', cities))
+    .then(data=> {
+        // OK, all records have been inserted
+        console.log('wahooo', data)
+    })
+    .catch(error=> {
+        // Error, no records inserted
+        console.log('error', error);
+    });
+
 
 
 
