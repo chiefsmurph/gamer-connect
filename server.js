@@ -7,21 +7,22 @@ var express = require('express');
 var app = express();
 
 
-var options = {
-  key: fs.readFileSync('/etc/letsencrypt/live/chiefsmurph.com/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/chiefsmurph.com/cert.pem'),
-  ca: fs.readFileSync('/etc/letsencrypt/live/chiefsmurph.com/chain.pem')
-};
+// var options = {
+//   key: fs.readFileSync('/etc/letsencrypt/live/chiefsmurph.com/privkey.pem', 'utf8'),
+//   cert: fs.readFileSync('/etc/letsencrypt/live/chiefsmurph.com/cert.pem', 'utf8'),
+//   ca: fs.readFileSync('/etc/letsencrypt/live/chiefsmurph.com/chain.pem', 'utf8')
+// };
 
 
 var port = process.env.PORT || 443; // Use the port that Heroku
 
-const server = require('https').Server(app, options)
+// const server = require('http').Server(app)
 
+
+const server = app.listen(port);
 
 var io = require('socket.io')(server);
 
-server.listen(port);
 
 console.log('listening on ' + port);
 
