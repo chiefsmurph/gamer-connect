@@ -7,21 +7,21 @@ var express = require('express');
 var app = express();
 
 
-// var options = {
-//   key: fs.readFileSync('./nginx-selfsigned.key'),
-//   cert: fs.readFileSync('./nginx-selfsigned.crt')
-// };
+var options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/chiefsmurph.com/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/chiefsmurph.com/cert.pem'),
+  ca: fs.readFileSync('/etc/letsencrypt/live/chiefsmurph.com/chain.pem')
+};
 
 
 var port = process.env.PORT || 443; // Use the port that Heroku
-const server = app.listen(port);
 
-// const server = require('http').Server(app)
+const server = require('https').Server(app, options)
 
 
 var io = require('socket.io')(server);
 
-// server.listen(port);
+server.listen(port);
 
 console.log('listening on ' + port);
 
