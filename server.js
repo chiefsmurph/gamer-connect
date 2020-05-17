@@ -631,15 +631,15 @@ console.log(cities)
 
 console.log(JSON.stringify(cities, null, 2));
 
-var i = 0;
-var async = require('async');
-async.forEachSeries(cities, (city, cityCallback) => {
-  CitiesDistance.addNewCity(city.name, city.lat, city.lon, () => {
-    console.log('woo hoo, its #' + i);
-    i++;
-    cityCallback();
-  });
-});
+// var i = 0;
+// var async = require('async');
+// async.forEachSeries(cities, (city, cityCallback) => {
+//   CitiesDistance.addNewCity(city.name, city.lat, city.lon, () => {
+//     console.log('woo hoo, its #' + i);
+//     i++;
+//     cityCallback();
+//   });
+// });
 
 
 function Inserts(template, data) {
