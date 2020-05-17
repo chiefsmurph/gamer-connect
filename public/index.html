@@ -485,7 +485,7 @@
       }
     };
 
-    var socket = io.connect(`https://chiefsmurph.com/gamerconnect`, { secure: true });
+    var socket = io.connect(`https://chiefsmurph.com`, { secure: true, path: '/gamerconnect' });
     var app = johnsFramework({
       isMobile: (function() {
         var check = false;
