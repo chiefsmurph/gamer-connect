@@ -653,7 +653,7 @@ function Inserts(template, data) {
 }
 
 var pgp = require('pg-promise')();
-var db = pgp(process.env.DATABASE_URL + '?ssl=true');
+var db = pgp(process.env.DATABASE_URL);
 
 //
 
