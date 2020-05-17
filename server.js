@@ -598,7 +598,7 @@ var CityPeople = new TableInterface(pg, process.env.DATABASE_URL, 'city_people',
 
 //
 const cities = require("all-the-cities");
-console.log(cities)
+console.log(cities.length)
 
 
 // var converter = require('json-2-csv');
@@ -629,17 +629,17 @@ console.log(cities)
 
 
 
-console.log(JSON.stringify(cities, null, 2));
+// console.log(JSON.stringify(cities, null, 2));
 
-var i = 0;
-var async = require('async');
-async.forEachSeries(cities, (city, cityCallback) => {
-  CitiesDistance.addNewCity(city.name, city.lat, city.lon, () => {
-    console.log('woo hoo, its #' + i);
-    i++;
-    cityCallback();
-  });
-});
+// var i = 0;
+// var async = require('async');
+// async.forEachSeries(cities, (city, cityCallback) => {
+//   CitiesDistance.addNewCity(city.name, city.lat, city.lon, () => {
+//     console.log('woo hoo, its #' + i);
+//     i++;
+//     cityCallback();
+//   });
+// });
 
 
 // function Inserts(template, data) {
