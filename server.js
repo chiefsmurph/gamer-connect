@@ -12,13 +12,16 @@ var app = express();
 //   cert: fs.readFileSync('./nginx-selfsigned.crt')
 // };
 
-const server = require('http').Server(app)
+
+var port = process.env.PORT || 443; // Use the port that Heroku
+const server = app.listen(port);
+
+// const server = require('http').Server(app)
 
 
 var io = require('socket.io')(server);
 
-var port = process.env.PORT || 443; // Use the port that Heroku
-server.listen(port);
+// server.listen(port);
 
 console.log('listening on ' + port);
 
