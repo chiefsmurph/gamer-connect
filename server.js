@@ -492,7 +492,8 @@ var CitiesDistance = new TableInterface(pg, process.env.DATABASE_URL, 'cities_di
   lat: ['float', 'not null'],
   long: ['float', 'not null']
 }, function() {
-  this.addNewCity = function(cityName, lat, long, cb) {
+  this.addNewCity = function(city, cb) {
+    const { name: cityName, lat, long } = city;
     console.log('creating new city ' + cityName);
     return this.insert({
       cityname: cityName,
@@ -631,15 +632,15 @@ console.log(cities.length)
 
 // console.log(JSON.stringify(cities, null, 2));
 
-// var i = 0;
-// var async = require('async');
-// async.forEachSeries(cities, (city, cityCallback) => {
-//   CitiesDistance.addNewCity(city.name, city.lat, city.lon, () => {
-//     console.log('woo hoo, its #' + i);
-//     i++;
-//     cityCallback();
-//   });
-// });
+var i = 0;
+var async = require('async');
+async.forEachSeries(cities, (city, cityCallback) => {
+  CitiesDistance.addNewCity(city, () => {
+    console.log('woo hoo, its #' + i);
+    i++;
+    cityCallback();
+  });
+});
 
 
 // function Inserts(template, data) {
@@ -1312,17 +1313,17 @@ var CronJob = require('cron').CronJob;
 
   };
 
-  // [{
-  //   // every night at 12:00am
-  //   pattern: '0 0 0 0 * *',
-  //   fn: endOfDay
-  // }, {
-  //   // every sunday night / monday morning 12:03am
-  //   pattern: '0 3 0 * * 1',
-  //   fn: endOfWeek
-  // }].forEach(function(toTakePlace) {
-  //   console.log({ toTakePlace })
-  //   new CronJob(toTakePlace.pattern, toTakePlace.fn, null, true, "America/New_York");
-  // });
+  [{
+    // every night at 12:00am
+    pattern: '0 0 */6 * * *',
+    fn: endOfDay
+  }, {
+    // every sunday night / monday morning 12:03am
+    pattern: '0 0 0 * * *',
+    fn: endOfWeek
+  }].forEach(function(toTakePlace) {
+    console.log({ toTakePlace })
+    new CronJob(toTakePlace.pattern, toTakePlace.fn, null, true, "America/New_York");
+  });
 
 })();
