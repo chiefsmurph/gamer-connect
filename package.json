@@ -19,7 +19,7 @@
   "homepage": "https://github.com/chiefsmurph/city-distance#readme",
   "dependencies": {
     "all-the-cities": "^1.0.0",
-    "async": "^2.1.4",
+    "async": "^2.6.4",
     "body-parser": "^1.15.2",
     "cities": "^1.1.2",
     "cron": "^1.1.1",
