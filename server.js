@@ -88,15 +88,15 @@ async function makeTables() {
   ];
   for (q of queries) {
     console.log(`starting: ${q}`);
-    await new Promise(resolve =>
-      pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-        client.query(q, function(err, result) {
-          done();
-          console.log(`done: ${q}`);
-          resolve();
-        });
-      })
-    );
+    // await new Promise(resolve =>
+    //   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+    //     client.query(q, function(err, result) {
+    //       done();
+    //       console.log(`done: ${q}`);
+    //       resolve();
+    //     });
+    //   })
+    // );
   }
 }
 
