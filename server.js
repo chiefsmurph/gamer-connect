@@ -1,4 +1,4 @@
-console.log('DB URL!!! ' + process.env.DATABASE_URL + '?ssl=true');
+console.log('DB URL!!! ' + process.env.DATABASE_URL);
 
 var uuid = require('uuid');
 var pg = require('pg');
@@ -47,7 +47,7 @@ app.use(express.static(__dirname + '/public'));
 
 //
 //
-// pg.connect(process.env.DATABASE_URL + '?ssl=true', function(err, client) {
+// pg.connect(process.env.DATABASE_URL, function(err, client) {
 //   var query = client.query('CREATE  ');
 //   console.log('adding pledge col');
 //   query.on('row', function(row) {
@@ -57,7 +57,7 @@ app.use(express.static(__dirname + '/public'));
 
 
 //
-// pg.connect(process.env.DATABASE_URL + '?ssl=true', function(err, client) {
+// pg.connect(process.env.DATABASE_URL, function(err, client) {
 //   console.log('about to insert');
 //   var queryText = 'INSERT INTO pledges(fsname, email) VALUES($1, $2)'
 //   client.query(queryText, [req.body.name, req.body.email], function(err, result) {
@@ -85,7 +85,7 @@ io.sockets.on('connection', function (socket) {
 
 // var dbFunctions = {
 //   executeQuery: function(q, callback) {
-//     pg.connect(process.env.DATABASE_URL + '?ssl=true', function(err, client, done) {
+//     pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 //       //CREATE TABLE pointss (dbId serial primary key, username VARCHAR(30) not null, points INT, handshake VARCHAR(60))
 //       var query = client.query(q, function(err, result) {
 //         done();
@@ -102,7 +102,7 @@ io.sockets.on('connection', function (socket) {
 //
 //     console.log('creating new city ' + cityName);
 //     // insert
-//     pg.connect(process.env.DATABASE_URL + '?ssl=true', function(err, client, done) {
+//     pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 //       var queryText = 'INSERT INTO cities_distance (cityName, lat, long) VALUES($1, $2, $3)';
 //       client.query(queryText, [cityName, lat, long], function(err, result) {
 //
@@ -116,7 +116,7 @@ io.sockets.on('connection', function (socket) {
 //
 //   },
 //   getAllCities: function(callback) {
-//     pg.connect(process.env.DATABASE_URL + '?ssl=true', function(err, client, done) {
+//     pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 //       client.query('SELECT * FROM cities_distance', function(err, result) {
 //
 //         done();
@@ -137,7 +137,7 @@ io.sockets.on('connection', function (socket) {
 //       });
 //     };
 //     console.log('getting cities near ' + lat + ', ' + long);
-//     pg.connect(process.env.DATABASE_URL + '?ssl=true' , function(err, client, done) {
+//     pg.connect(process.env.DATABASE_URL , function(err, client, done) {
 //       //client.query('SELECT * FROM cities_distance WHERE power(lat - ' + lat + ', 2) + power(long - ' + long +', 2) < 1000', function(err, result) {
 //       client.query('SELECT * FROM cities_distance WHERE earth_box(ll_to_earth(' + lat + ', ' + long + '), 50000) @> ll_to_earth(lat, long)', function(err, result) {
 //         done();
@@ -174,7 +174,7 @@ io.sockets.on('connection', function (socket) {
 //
 //   },
 //   verifyUser: function(playerid, hashcode, callback) {
-//     pg.connect(process.env.DATABASE_URL + '?ssl=true' , function(err, client, done) {
+//     pg.connect(process.env.DATABASE_URL , function(err, client, done) {
 //       //client.query('SELECT * FROM cities_distance WHERE power(lat - ' + lat + ', 2) + power(long - ' + long +', 2) < 1000', function(err, result) {
 //       client.query('SELECT * FROM city_people WHERE playerid = ' + playerid + ' AND hashcode = \'' + hashcode + '\'', function(err, result) {
 //         done();
@@ -185,7 +185,7 @@ io.sockets.on('connection', function (socket) {
 //     });
 //   },
 //   getCurrentLeader: function(cityid, callback) {
-//     pg.connect(process.env.DATABASE_URL + '?ssl=true' , function(err, client, done) {
+//     pg.connect(process.env.DATABASE_URL , function(err, client, done) {
 //       //client.query('SELECT * FROM cities_distance WHERE power(lat - ' + lat + ', 2) + power(long - ' + long +', 2) < 1000', function(err, result) {
 //       client.query('SELECT * FROM land_claims WHERE cityid = ' +cityid + ' AND isActive = true ORDER BY claimDate DESC LIMIT 1', function(err, result) {
 //         done();
@@ -199,7 +199,7 @@ io.sockets.on('connection', function (socket) {
 //     });
 //   },
 //   getAllPlayers: function(callback) {
-//     pg.connect(process.env.DATABASE_URL + '?ssl=true' , function(err, client, done) {
+//     pg.connect(process.env.DATABASE_URL , function(err, client, done) {
 //       //client.query('SELECT * FROM cities_distance WHERE power(lat - ' + lat + ', 2) + power(long - ' + long +', 2) < 1000', function(err, result) {
 //       client.query('SELECT * FROM city_people', function(err, result) {
 //         done();
@@ -677,7 +677,7 @@ async.forEachSeries(cities, (city, cityCallback) => {
 // var copyFrom = require('pg-copy-streams').from;
 // var Readable = require('stream').Readable;
 //
-// pg.connect(process.env.DATABASE_URL + '?ssl=true', function(err, client, done) {
+// pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 //   var origDone = done;
 //   done = function(err) {
 //     console.log('done', err);
