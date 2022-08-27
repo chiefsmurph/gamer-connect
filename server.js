@@ -86,9 +86,17 @@ async function makeTables() {
     `CREATE TABLE city_people (playerId serial primary key, username VARCHAR(70) not null, hashcode VARCHAR(70) not null, joinDate timestamp without time zone default (now() at time zone 'utc'), points integer default 0, isBanned boolean default false, lat float not null, long float not null, nearestCity varchar(70) not null)`,
     `CREATE TABLE land_claims (claimId serial primary key, cityId integer not null, cityName VARCHAR(70) not null, leadername VARCHAR(70) not null, leaderid integer not null, claimDate timestamp without time zone default (now() at time zone 'utc'), points integer default 0, isActive boolean default true)`,
   ];
-  for (query of queries) {
-    await dbFunctions.executeQuery(query);
-    console.log(`done: ${query}`);
+  for (q of queries) {
+    console.log(`starting: ${q}`);
+    await new Promise(resolve =>
+      pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+        client.query(q, function(err, result) {
+          done();
+          console.log(`done: ${q}`);
+          resolve();
+        });
+      })
+    );
   }
 }
 
