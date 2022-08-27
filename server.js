@@ -79,6 +79,21 @@ io.sockets.on('connection', function (socket) {
 });
 
 
+
+async function makeTables() {
+  const queries = [
+    `CREATE TABLE cities_distance (cityId serial primary key, cityName VARCHAR(70) not null, country VARCHAR(70), adminCode VARCHAR(70), population integer, lat float not null, long float not null)'`
+    `CREATE TABLE city_people (playerId serial primary key, username VARCHAR(70) not null, hashcode VARCHAR(70) not null, joinDate timestamp without time zone default (now() at time zone 'utc'), points integer default 0, isBanned boolean default false, lat float not null, long float not null, nearestCity varchar(70) not null)'`,
+    `CREATE TABLE land_claims (claimId serial primary key, cityId integer not null, cityName VARCHAR(70) not null, leadername VARCHAR(70) not null, leaderid integer not null, claimDate timestamp without time zone default (now() at time zone 'utc'), points integer default 0, isActive boolean default true)`,
+  ];
+  for (query of queries) {
+    await dbFunctions.executeQuery(query);
+    console.log(`done: ${query}`);
+  }
+}
+
+
+
 // var cities = require('cities');
 
 
@@ -264,20 +279,6 @@ io.sockets.on('connection', function (socket) {
 // };
 
 
-
-async function makeTables() {
-  const queries = [
-    `CREATE TABLE cities_distance (cityId serial primary key, cityName VARCHAR(70) not null, country VARCHAR(70), adminCode VARCHAR(70), population integer, lat float not null, long float not null)'`
-    `CREATE TABLE city_people (playerId serial primary key, username VARCHAR(70) not null, hashcode VARCHAR(70) not null, joinDate timestamp without time zone default (now() at time zone 'utc'), points integer default 0, isBanned boolean default false, lat float not null, long float not null, nearestCity varchar(70) not null)'`,
-    `CREATE TABLE land_claims (claimId serial primary key, cityId integer not null, cityName VARCHAR(70) not null, leadername VARCHAR(70) not null, leaderid integer not null, claimDate timestamp without time zone default (now() at time zone 'utc'), points integer default 0, isActive boolean default true)`,
-  ];
-  for (query of queries) {
-    await dbFunctions.executeQuery(query);
-    console.log(`done: ${query}`);
-  }
-}
-
-makeTables();
 
 //CREATE TABLE land_claims (claimId serial primary key, cityId integer not null, cityName VARCHAR(70) not null, leadername VARCHAR(70) not null, leaderid integer not null, claimDate timestamp without time zone default (now() at time zone 'utc'), points integer default 0, isActive boolean default true)
 
@@ -644,13 +645,17 @@ console.log(cities.length)
 
 var i = 0;
 var async = require('async');
-async.forEachSeries(cities, (city, cityCallback) => {
-  CitiesDistance.addNewCity(city, () => {
-    console.log('woo hoo, its #' + i);
-    i++;
-    cityCallback();
-  });
-});
+
+(async () => {
+  await makeTables();
+  async.forEachSeries(cities, (city, cityCallback) => {
+    CitiesDistance.addNewCity(city, () => {
+      console.log('woo hoo, its #' + i);
+      i++;
+      cityCallback();
+    });
+  });  
+})(); 
 
 
 // function Inserts(template, data) {
