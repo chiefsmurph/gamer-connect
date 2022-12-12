@@ -23,7 +23,7 @@
     "body-parser": "^1.15.2",
     "cities": "^1.1.2",
     "cron": "^1.1.1",
-    "express": "^4.14.0",
+    "express": "^4.17.3",
     "http": "0.0.0",
     "https": "^1.0.0",
     "node-geocoder": "^3.15.1",
